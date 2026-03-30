@@ -225,30 +225,31 @@ export default function EditTime() {
           )}
         </>
       ) : (
-        (console.log(startTime),
-        (
-          <TextInput
-            placeholder="Start (HH:MM)"
-            value={startTime}
-            onChangeText={(text) => {
-              setStartTime(text);
+        <TextInput
+          placeholder="Start (HH:MM)"
+          value={startTime}
+          onChangeText={(text) => {
+            setStartTime(text);
 
-              if (date && text) {
-                const local = new Date(`${date}T${text}`);
-                if (!isNaN(local)) {
-                  setStartDateObj(local);
-                }
-              }
-            }}
-            style={{
-              backgroundColor: isDark ? "#1e1e1e" : "#fff",
-              color: isDark ? "#fff" : "#000",
-              padding: 12,
-              borderRadius: 8,
-              marginBottom: 10,
-            }}
-          />
-        ))
+            const [h, m] = text.split(":");
+
+            if (startDateObj && h && m) {
+              const updated = new Date(startDateObj);
+
+              updated.setHours(Number(h));
+              updated.setMinutes(Number(m));
+
+              setStartDateObj(updated);
+            }
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+        />
       )}
 
       {/* 📅 END DATE */}
@@ -335,30 +336,31 @@ export default function EditTime() {
           )}
         </>
       ) : (
-        (console.log(endTime),
-        (
-          <TextInput
-            placeholder="End (HH:MM)"
-            value={endTime}
-            onChangeText={(text) => {
-              setEndTime(text);
+        <TextInput
+          placeholder="End (HH:MM)"
+          value={endTime}
+          onChangeText={(text) => {
+            setEndTime(text);
 
-              if (endDate && text) {
-                const local = new Date(`${endDate}T${text}`);
-                if (!isNaN(local)) {
-                  setEndDateObj(local);
-                }
-              }
-            }}
-            style={{
-              backgroundColor: isDark ? "#1e1e1e" : "#fff",
-              color: isDark ? "#fff" : "#000",
-              padding: 12,
-              borderRadius: 8,
-              marginBottom: 20,
-            }}
-          />
-        ))
+            const [h, m] = text.split(":");
+
+            if (endDateObj && h && m) {
+              const updated = new Date(endDateObj);
+
+              updated.setHours(Number(h));
+              updated.setMinutes(Number(m));
+
+              setEndDateObj(updated);
+            }
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 20,
+          }}
+        />
       )}
 
       {/* 🔍 JOB SEARCH */}
