@@ -205,7 +205,13 @@ export default function EditTime() {
             }}
           >
             <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              Start: {payload?.clock_in || "Select Time"}
+              Start:{" "}
+              {entry?.clock_in
+                ? new Date(entry.clock_in).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "Select Time"}
             </Text>
           </TouchableOpacity>
 
