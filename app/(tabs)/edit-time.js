@@ -45,13 +45,16 @@ export default function EditTime() {
 
     setEntry(data);
 
-    // ✅ LOAD VALUES
+    // ✅ DATE
     if (data.date) setDate(data.date);
 
+    // ✅ CLOCK IN (UTC → LOCAL)
     if (data.clock_in) {
-      const local = new Date(data.clock_in);
-      const h = local.getHours().toString().padStart(2, "0");
-      const m = local.getMinutes().toString().padStart(2, "0");
+      const local = new Date(data.clock_in); // JS auto converts UTC → local
+
+      const h = String(local.getHours()).padStart(2, "0");
+      const m = String(local.getMinutes()).padStart(2, "0");
+
       setStartTime(`${h}:${m}`);
     }
 
