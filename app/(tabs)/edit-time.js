@@ -2,12 +2,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-    useColorScheme,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  useColorScheme,
 } from "react-native";
 import { API_BASE } from "../../config";
 
@@ -49,12 +49,22 @@ export default function EditTime() {
     if (data.date) setDate(data.date);
 
     if (data.clock_in) {
-      setStartTime(data.clock_in.slice(11, 16));
+      const local = new Date(data.clock_in);
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
+      setStartTime(`${h}:${m}`);
     }
 
     if (data.clock_out) {
-      setEndTime(data.clock_out.slice(11, 16));
-      setEndDate(data.clock_out.slice(0, 10)); // 🔥 NEW
+      const local = new Date(data.clock_out);
+
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
+
+      setEndTime(`${h}:${m}`);
+
+      const d = local.toLocaleDateString("en-CA"); // YYYY-MM-DD in LOCAL
+      setEndDate(d);
     }
 
     setQuery(data.job_code || "");
@@ -79,15 +89,21 @@ export default function EditTime() {
   const formatForSQL = (dateStr, timeStr) => {
     if (!dateStr || !timeStr || !timeStr.includes(":")) return null;
 
-    const [h, m] = timeStr.split(":");
+    const [year, month, day] = dateStr.split("-");
+    const [hour, minute] = timeStr.split(":");
 
-    if (h === "" || m === "") return null;
+    // Create LOCAL date
+    const local = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+    );
 
-    const pad = (n) => n.toString().padStart(2, "0");
-
-    return `${dateStr} ${pad(h)}:${pad(m)}:00`;
+    // Convert to UTC ISO string
+    return local.toISOString(); // ✅ THIS FIXES EVERYTHING
   };
-
   // 💾 SAVE
   const saveChanges = async () => {
     const updated = {
@@ -152,7 +168,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowDate(false);
                 if (selected) {
-                  const formatted = selected.toISOString().split("T")[0];
+                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
                   setDate(formatted);
                 }
               }}
@@ -245,7 +261,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEndDate(false);
                 if (selected) {
-                  const formatted = selected.toISOString().split("T")[0];
+                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
                   setEndDate(formatted);
                 }
               }}
