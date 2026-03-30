@@ -205,7 +205,7 @@ export default function EditTime() {
             }}
           >
             <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              Start: {startTime || "Select Time"}
+              Start: {payload?.clock_in || "Select Time"}
             </Text>
           </TouchableOpacity>
 
