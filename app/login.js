@@ -1,0 +1,139 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { API_BASE } from "../config";
+
+export default function Login() {
+  const router = useRouter();
+
+  const scheme = useColorScheme();
+  const isDark = scheme === "dark";
+
+  const colors = {
+    background: isDark ? "#121212" : "#f2f2f2",
+    card: isDark ? "#1e1e1e" : "#ffffff",
+    text: isDark ? "#ffffff" : "#000000",
+    border: isDark ? "#333" : "#ccc",
+    placeholder: isDark ? "#aaa" : "#666",
+    button: "#4CAF50",
+  };
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        Alert.alert("Login Failed", data.detail);
+        return;
+      }
+
+      // ✅ SAVE USER SESSION
+      await AsyncStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: data.username,
+          role: data.role,
+          id: data.id, // ✅ MUST MATCH BACKEND
+        }),
+      );
+      console.log("STORING USER:", data);
+      router.replace("/(tabs)");
+    } catch (err) {
+      Alert.alert("Error", "Network error");
+    }
+  };
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        padding: 20,
+        backgroundColor: colors.background,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 28,
+          marginBottom: 20,
+          color: colors.text,
+        }}
+      >
+        Login
+      </Text>
+
+      <TextInput
+        placeholder="Username"
+        placeholderTextColor={colors.placeholder}
+        value={username}
+        onChangeText={setUsername}
+        style={{
+          borderWidth: 1,
+          borderColor: colors.border,
+          padding: 12,
+          marginBottom: 12,
+          borderRadius: 8,
+          color: colors.text,
+          backgroundColor: colors.card,
+        }}
+      />
+
+      <TextInput
+        placeholder="Password"
+        placeholderTextColor={colors.placeholder}
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        style={{
+          borderWidth: 1,
+          borderColor: colors.border,
+          padding: 12,
+          marginBottom: 12,
+          borderRadius: 8,
+          color: colors.text,
+          backgroundColor: colors.card,
+        }}
+      />
+
+      <TouchableOpacity
+        onPress={handleLogin}
+        style={{
+          backgroundColor: colors.button,
+          padding: 15,
+          borderRadius: 8,
+          marginTop: 10,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push("/create-user")}
+        style={{ marginTop: 15 }}
+      >
+        <Text style={{ color: "#4CAF50", textAlign: "center" }}>
+          Create Account
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
