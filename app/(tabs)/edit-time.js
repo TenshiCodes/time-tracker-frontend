@@ -109,19 +109,18 @@ export default function EditTime() {
   };
   // 💾 SAVE
   const saveChanges = async () => {
-    const updated = {
-      ...entry,
+    const payload = {
       date: date,
-      clock_in: formatForSQL(date, startTime),
-      clock_out: formatForSQL(endDate || date, endTime), // 🔥 FIX
+      clock_in: startDateObj.toISOString(),
+      clock_out: endDateObj.toISOString(), // ✅ converts to UTC
     };
 
-    console.log("💾 SAVING:", updated);
+    console.log("💾 SAVING:", payload);
 
     await fetch(`${API_BASE}/time/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated),
+      body: JSON.stringify(payload),
     });
 
     router.replace("/time");
@@ -216,10 +215,17 @@ export default function EditTime() {
               mode="time"
               onChange={(e, selected) => {
                 setShowStart(false);
+
                 if (selected) {
-                  const h = selected.getHours().toString().padStart(2, "0");
-                  const m = selected.getMinutes().toString().padStart(2, "0");
-                  setStartTime(`${h}:${m}`);
+                  const timeStr = selected.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  setStartTime(timeStr);
+
+                  // ✅ IMPORTANT (store real date for backend later)
+                  setStartDateObj(selected);
                 }
               }}
             />
