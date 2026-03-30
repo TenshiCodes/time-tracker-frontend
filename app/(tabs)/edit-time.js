@@ -22,14 +22,18 @@ export default function EditTime() {
 
   // ✅ STATES
   const [date, setDate] = useState("");
-  const [endDate, setEndDate] = useState(""); // 🔥 NEW
+  const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  // ✅ REAL DATE OBJECTS (CRITICAL)
+  const [startDateObj, setStartDateObj] = useState(null);
+  const [endDateObj, setEndDateObj] = useState(null);
 
   const [showDate, setShowDate] = useState(false);
   const [showStart, setShowStart] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
-  const [showEndDate, setShowEndDate] = useState(false); // 🔥 NEW
+  const [showEndDate, setShowEndDate] = useState(false);
 
   // 🔍 JOB SEARCH
   const [query, setQuery] = useState("");
@@ -45,28 +49,36 @@ export default function EditTime() {
 
     setEntry(data);
 
-    // ✅ DATE
     if (data.date) setDate(data.date);
 
     // ✅ CLOCK IN (UTC → LOCAL)
     if (data.clock_in) {
-      const local = new Date(data.clock_in); // JS auto converts UTC → local
+      const local = new Date(data.clock_in);
 
-      const h = String(local.getHours()).padStart(2, "0");
-      const m = String(local.getMinutes()).padStart(2, "0");
+      setStartDateObj(local);
 
-      setStartTime(`${h}:${m}`);
+      const timeStr = local.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      setStartTime(timeStr);
     }
 
+    // ✅ CLOCK OUT
     if (data.clock_out) {
       const local = new Date(data.clock_out);
 
-      const h = local.getHours().toString().padStart(2, "0");
-      const m = local.getMinutes().toString().padStart(2, "0");
+      setEndDateObj(local);
 
-      setEndTime(`${h}:${m}`);
+      const timeStr = local.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
-      const d = local.toLocaleDateString("en-CA"); // YYYY-MM-DD in LOCAL
+      setEndTime(timeStr);
+
+      const d = local.toLocaleDateString("en-CA");
       setEndDate(d);
     }
 
@@ -88,31 +100,12 @@ export default function EditTime() {
     setResults(data.slice(0, 3));
   };
 
-  // 🧠 FORMAT FOR SQLITE
-  const formatForSQL = (dateStr, timeStr) => {
-    if (!dateStr || !timeStr || !timeStr.includes(":")) return null;
-
-    const [year, month, day] = dateStr.split("-");
-    const [hour, minute] = timeStr.split(":");
-
-    // Create LOCAL date
-    const local = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute),
-    );
-
-    // Convert to UTC ISO string
-    return local.toISOString(); // ✅ THIS FIXES EVERYTHING
-  };
   // 💾 SAVE
   const saveChanges = async () => {
     const payload = {
-      date: date,
-      clock_in: startDateObj.toISOString(),
-      clock_out: endDateObj.toISOString(), // ✅ converts to UTC
+      date,
+      clock_in: startDateObj ? startDateObj.toISOString() : null,
+      clock_out: endDateObj ? endDateObj.toISOString() : null,
     };
 
     console.log("💾 SAVING:", payload);
@@ -170,7 +163,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowDate(false);
                 if (selected) {
-                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                  const formatted = selected.toLocaleDateString("en-CA");
                   setDate(formatted);
                 }
               }}
@@ -205,33 +198,25 @@ export default function EditTime() {
             }}
           >
             <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              Start:{" "}
-              {entry?.clock_in
-                ? new Date(entry.clock_in).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "Select Time"}
+              Start: {startTime || "Select Time"}
             </Text>
           </TouchableOpacity>
 
           {showStart && (
             <DateTimePicker
-              value={new Date()}
+              value={startDateObj || new Date()}
               mode="time"
               onChange={(e, selected) => {
                 setShowStart(false);
-
                 if (selected) {
+                  setStartDateObj(selected);
+
                   const timeStr = selected.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   });
 
                   setStartTime(timeStr);
-
-                  // ✅ IMPORTANT (store real date for backend later)
-                  setStartDateObj(selected);
                 }
               }}
             />
@@ -241,7 +226,16 @@ export default function EditTime() {
         <TextInput
           placeholder="Start (HH:MM)"
           value={startTime}
-          onChangeText={setStartTime}
+          onChangeText={(text) => {
+            setStartTime(text);
+
+            if (date && text) {
+              const local = new Date(`${date}T${text}`);
+              if (!isNaN(local)) {
+                setStartDateObj(local);
+              }
+            }
+          }}
           style={{
             backgroundColor: isDark ? "#1e1e1e" : "#fff",
             color: isDark ? "#fff" : "#000",
@@ -252,7 +246,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* 📅 END DATE (NEW) */}
+      {/* 📅 END DATE */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -276,7 +270,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEndDate(false);
                 if (selected) {
-                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                  const formatted = selected.toLocaleDateString("en-CA");
                   setEndDate(formatted);
                 }
               }}
@@ -317,14 +311,19 @@ export default function EditTime() {
 
           {showEnd && (
             <DateTimePicker
-              value={new Date()}
+              value={endDateObj || new Date()}
               mode="time"
               onChange={(e, selected) => {
                 setShowEnd(false);
                 if (selected) {
-                  const h = selected.getHours().toString().padStart(2, "0");
-                  const m = selected.getMinutes().toString().padStart(2, "0");
-                  setEndTime(`${h}:${m}`);
+                  setEndDateObj(selected);
+
+                  const timeStr = selected.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  setEndTime(timeStr);
                 }
               }}
             />
@@ -334,7 +333,16 @@ export default function EditTime() {
         <TextInput
           placeholder="End (HH:MM)"
           value={endTime}
-          onChangeText={setEndTime}
+          onChangeText={(text) => {
+            setEndTime(text);
+
+            if (endDate && text) {
+              const local = new Date(`${endDate}T${text}`);
+              if (!isNaN(local)) {
+                setEndDateObj(local);
+              }
+            }
+          }}
           style={{
             backgroundColor: isDark ? "#1e1e1e" : "#fff",
             color: isDark ? "#fff" : "#000",
