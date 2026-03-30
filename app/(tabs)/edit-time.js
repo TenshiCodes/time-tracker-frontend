@@ -63,6 +63,7 @@ export default function EditTime() {
       });
 
       setStartTime(timeStr);
+      console.log("⏱ CLOCK IN (LOCAL):", timeStr);
     }
 
     // ✅ CLOCK OUT
@@ -70,6 +71,7 @@ export default function EditTime() {
       const local = new Date(data.clock_out);
 
       setEndDateObj(local);
+      console.log("⏱ CLOCK OUT (LOCAL):", local);
 
       const timeStr = local.toLocaleTimeString([], {
         hour: "2-digit",
@@ -77,7 +79,7 @@ export default function EditTime() {
       });
 
       setEndTime(timeStr);
-
+      console.log("⏱ CLOCK OUT TIME (LOCAL):", timeStr);
       const d = local.toLocaleDateString("en-CA");
       setEndDate(d);
     }
@@ -223,27 +225,30 @@ export default function EditTime() {
           )}
         </>
       ) : (
-        <TextInput
-          placeholder="Start (HH:MM)"
-          value={startTime}
-          onChangeText={(text) => {
-            setStartTime(text);
+        (console.log(startTime),
+        (
+          <TextInput
+            placeholder="Start (HH:MM)"
+            value={startTime}
+            onChangeText={(text) => {
+              setStartTime(text);
 
-            if (date && text) {
-              const local = new Date(`${date}T${text}`);
-              if (!isNaN(local)) {
-                setStartDateObj(local);
+              if (date && text) {
+                const local = new Date(`${date}T${text}`);
+                if (!isNaN(local)) {
+                  setStartDateObj(local);
+                }
               }
-            }
-          }}
-          style={{
-            backgroundColor: isDark ? "#1e1e1e" : "#fff",
-            color: isDark ? "#fff" : "#000",
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 10,
-          }}
-        />
+            }}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              color: isDark ? "#fff" : "#000",
+              padding: 12,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+        ))
       )}
 
       {/* 📅 END DATE */}
@@ -330,27 +335,30 @@ export default function EditTime() {
           )}
         </>
       ) : (
-        <TextInput
-          placeholder="End (HH:MM)"
-          value={endTime}
-          onChangeText={(text) => {
-            setEndTime(text);
+        (console.log(endTime),
+        (
+          <TextInput
+            placeholder="End (HH:MM)"
+            value={endTime}
+            onChangeText={(text) => {
+              setEndTime(text);
 
-            if (endDate && text) {
-              const local = new Date(`${endDate}T${text}`);
-              if (!isNaN(local)) {
-                setEndDateObj(local);
+              if (endDate && text) {
+                const local = new Date(`${endDate}T${text}`);
+                if (!isNaN(local)) {
+                  setEndDateObj(local);
+                }
               }
-            }
-          }}
-          style={{
-            backgroundColor: isDark ? "#1e1e1e" : "#fff",
-            color: isDark ? "#fff" : "#000",
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 20,
-          }}
-        />
+            }}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              color: isDark ? "#fff" : "#000",
+              padding: 12,
+              borderRadius: 8,
+              marginBottom: 20,
+            }}
+          />
+        ))
       )}
 
       {/* 🔍 JOB SEARCH */}
