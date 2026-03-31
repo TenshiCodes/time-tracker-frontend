@@ -445,6 +445,43 @@ export default function EditTime() {
           }}
         />
       )}
+      {/* 🔍 JOB SEARCH */}
+      <TextInput
+        placeholder="Search Job..."
+        value={query}
+        onChangeText={searchJobs}
+        style={{
+          backgroundColor: isDark ? "#1e1e1e" : "#fff",
+          color: isDark ? "#fff" : "#000",
+          padding: 12,
+          borderRadius: 8,
+          marginBottom: 10,
+        }}
+      />
+
+      {results.map((item) => (
+        <TouchableOpacity
+          key={item.id}
+          onPress={() => {
+            setEntry({
+              ...entry,
+              job_code: item.code,
+              item_id: item.id,
+            });
+            setQuery(`${item.name} (${item.code})`);
+            setResults([]);
+          }}
+          style={{
+            padding: 10,
+            backgroundColor: isDark ? "#2a2a2a" : "#ddd",
+            marginBottom: 5,
+            borderRadius: 6,
+          }}
+        >
+          <Text style={{ color: isDark ? "#fff" : "#000" }}>{item.name}</Text>
+          <Text style={{ color: "#888" }}>{item.code}</Text>
+        </TouchableOpacity>
+      ))}
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
