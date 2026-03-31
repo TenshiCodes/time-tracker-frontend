@@ -2,10 +2,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Platform,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  useColorScheme
+  useColorScheme,
 } from "react-native";
 import { API_BASE } from "../../config";
 
@@ -31,14 +33,11 @@ export default function EditTime() {
   const [showEnd, setShowEnd] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
 
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
 
-  // 🔥 FORCE UTC
+  // 🔥 FORCE UTC PARSE
   const parseUTC = (str) => {
     if (!str) return null;
 
@@ -63,39 +62,39 @@ export default function EditTime() {
 
     setEntry(data);
 
-    if (data.date) setDate(data.date);
-
+    // ✅ START DATE
     if (data.clock_in) {
       const local = parseUTC(data.clock_in);
 
       setStartDateObj(local);
 
+      const d = local.toLocaleDateString("en-CA");
+      console.log("📅 START DATE:", d);
+
+      setDate(d);
+
       const h = local.getHours().toString().padStart(2, "0");
       const m = local.getMinutes().toString().padStart(2, "0");
-
-      console.log("🕐 START:", h, m);
 
       setStartTime(`${h}:${m}`);
     }
 
+    // ✅ END DATE
     if (data.clock_out) {
       const local = parseUTC(data.clock_out);
 
       setEndDateObj(local);
 
+      const d = local.toLocaleDateString("en-CA");
+      console.log("📅 END DATE:", d);
+
+      setEndDate(d);
+
       const h = local.getHours().toString().padStart(2, "0");
       const m = local.getMinutes().toString().padStart(2, "0");
 
-      const d = local.toLocaleDateString("en-CA");
-
-      console.log("🕐 END:", h, m);
-      console.log("📅 END DATE:", d);
-
       setEndTime(`${h}:${m}`);
-      setEndDate(d);
     }
-
-    setQuery(data.job_code || "");
   };
 
   // 💾 SAVE
@@ -152,7 +151,57 @@ export default function EditTime() {
         Edit Time Entry
       </Text>
 
-      {/* START TIME */}
+      {/* 📅 START DATE */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowDate(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              Start Date: {date || "Select Date"}
+            </Text>
+          </TouchableOpacity>
+
+          {showDate && (
+            <DateTimePicker
+              value={startDateObj || new Date()}
+              mode="date"
+              onChange={(e, selected) => {
+                setShowDate(false);
+                if (selected) {
+                  console.log("📅 PICK START DATE:", selected.toString());
+
+                  setStartDateObj(selected);
+
+                  const d = selected.toLocaleDateString("en-CA");
+                  setDate(d);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="YYYY-MM-DD"
+          value={date}
+          onChangeText={setDate}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+        />
+      )}
+
+      {/* ⏱ START TIME */}
       <TouchableOpacity
         onPress={() => setShowStart(true)}
         style={{
@@ -174,8 +223,6 @@ export default function EditTime() {
           onChange={(e, selected) => {
             setShowStart(false);
             if (selected) {
-              console.log("🕐 PICK START:", selected.toString());
-
               setStartDateObj(selected);
 
               const h = selected.getHours().toString().padStart(2, "0");
@@ -187,7 +234,57 @@ export default function EditTime() {
         />
       )}
 
-      {/* END TIME */}
+      {/* 📅 END DATE */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowEndDate(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              End Date: {endDate || "Select Date"}
+            </Text>
+          </TouchableOpacity>
+
+          {showEndDate && (
+            <DateTimePicker
+              value={endDateObj || new Date()}
+              mode="date"
+              onChange={(e, selected) => {
+                setShowEndDate(false);
+                if (selected) {
+                  console.log("📅 PICK END DATE:", selected.toString());
+
+                  setEndDateObj(selected);
+
+                  const d = selected.toLocaleDateString("en-CA");
+                  setEndDate(d);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="YYYY-MM-DD"
+          value={endDate}
+          onChangeText={setEndDate}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+        />
+      )}
+
+      {/* ⏱ END TIME */}
       <TouchableOpacity
         onPress={() => setShowEnd(true)}
         style={{
@@ -209,8 +306,6 @@ export default function EditTime() {
           onChange={(e, selected) => {
             setShowEnd(false);
             if (selected) {
-              console.log("🕐 PICK END:", selected.toString());
-
               setEndDateObj(selected);
 
               const h = selected.getHours().toString().padStart(2, "0");
