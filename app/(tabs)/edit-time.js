@@ -42,7 +42,11 @@ export default function EditTime() {
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
-
+  // ✅ DEBUG HERE (runs every render)
+  useEffect(() => {
+    console.log("START STATE:", startTime);
+    console.log("ENTRY RAW:", entry?.clock_in);
+  }, [startTime, entry]);
   // ✅ LOAD ENTRY (UTC → LOCAL)
   const loadEntry = async () => {
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
