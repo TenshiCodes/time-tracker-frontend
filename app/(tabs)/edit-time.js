@@ -14,104 +14,57 @@ import { API_BASE } from "../../config";
 export default function EditTime() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const [startDateObj, setStartDateObj] = useState(null);
-  const [endDateObj, setEndDateObj] = useState(null);
+
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
   const [entry, setEntry] = useState(null);
 
+  // ✅ STATES
   const [date, setDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(""); // 🔥 NEW
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
   const [showDate, setShowDate] = useState(false);
   const [showStart, setShowStart] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
-  const [showEndDate, setShowEndDate] = useState(false);
+  const [showEndDate, setShowEndDate] = useState(false); // 🔥 NEW
 
+  // 🔍 JOB SEARCH
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const buildLocalDate = (dateStr, timeStr) => {
-    if (!dateStr || !timeStr) return null;
 
-    const [y, mo, d] = dateStr.split("-");
-    const [h, m] = timeStr.split(":");
-
-    const local = new Date(
-      Number(y),
-      Number(mo) - 1,
-      Number(d),
-      Number(h),
-      Number(m),
-    );
-
-    console.log("🔥 BUILD LOCAL DATE");
-    console.log("INPUT:", dateStr, timeStr);
-    console.log("LOCAL:", local);
-    console.log("ISO:", local.toISOString());
-
-    return local;
-  };
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
 
-  // ✅ LOAD ENTRY (UTC → LOCAL)
   const loadEntry = async () => {
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
     const data = await res.json();
 
     setEntry(data);
 
+    // ✅ LOAD VALUES
     if (data.date) setDate(data.date);
 
-    // CLOCK IN
     if (data.clock_in) {
-      const fixed = data.clock_in.endsWith("Z")
-        ? data.clock_in
-        : data.clock_in + "Z"; // 🔥 FORCE UTC
-
-      const local = new Date(fixed);
-
-      console.log("🔥 CLOCK IN FIX");
-      console.log("RAW:", data.clock_in);
-      console.log("FIXED:", fixed);
-      console.log("LOCAL:", local);
-
-      setStartDateObj(local);
-
-      setStartTime(
-        local.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      );
+      const local = new Date(data.clock_in);
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
+      setStartTime(`${h}:${m}`);
     }
 
     if (data.clock_out) {
-      const fixed = data.clock_out.endsWith("Z")
-        ? data.clock_out
-        : data.clock_out + "Z";
+      const local = new Date(data.clock_out);
 
-      const local = new Date(fixed);
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
 
-      console.log("🔥 CLOCK OUT FIX");
-      console.log("RAW:", data.clock_out);
-      console.log("FIXED:", fixed);
-      console.log("LOCAL:", local);
+      setEndTime(`${h}:${m}`);
 
-      setEndDateObj(local);
-
-      setEndTime(
-        local.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      );
-
-      setEndDate(local.toLocaleDateString("en-CA"));
+      const d = local.toLocaleDateString("en-CA"); // YYYY-MM-DD in LOCAL
+      setEndDate(d);
     }
 
     setQuery(data.job_code || "");
@@ -120,42 +73,52 @@ export default function EditTime() {
   // 🔍 SEARCH JOBS
   const searchJobs = async (text) => {
     setQuery(text);
-    if (!text) return setResults([]);
+
+    if (!text) {
+      setResults([]);
+      return;
+    }
 
     const res = await fetch(`${API_BASE}/search?q=${text}`);
     const data = await res.json();
+
     setResults(data.slice(0, 3));
   };
 
-  // ✅ BUILD LOCAL DATE (FIX)
-  const buildDateTime = (dateStr, timeStr) => {
-    if (!dateStr || !timeStr) return null;
+  // 🧠 FORMAT FOR SQLITE
+  const formatForSQL = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr || !timeStr.includes(":")) return null;
 
-    const [y, mo, d] = dateStr.split("-");
-    const [h, m] = timeStr.split(":");
+    const [year, month, day] = dateStr.split("-");
+    const [hour, minute] = timeStr.split(":");
 
-    return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(m));
+    // Create LOCAL date
+    const local = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+    );
+
+    // Convert to UTC ISO string
+    return local.toISOString(); // ✅ THIS FIXES EVERYTHING
   };
-
-  // 💾 SAVE (FIXED)
+  // 💾 SAVE
   const saveChanges = async () => {
-    const start = buildDateTime(date, startTime);
-    const end = buildDateTime(endDate, endTime);
-
-    const payload = {
-      date,
-      clock_in: start ? start.toISOString() : null,
-      clock_out: end ? end.toISOString() : null,
+    const updated = {
+      ...entry,
+      date: date,
+      clock_in: formatForSQL(date, startTime),
+      clock_out: formatForSQL(endDate || date, endTime), // 🔥 FIX
     };
-    console.log("LOCAL DATE OBJ:", startDateObj);
-    console.log("LOCAL HOURS:", startDateObj.getHours());
-    console.log("UTC HOURS:", startDateObj.getUTCHours());
-    console.log("💾 SAVING:", payload);
+
+    console.log("💾 SAVING:", updated);
 
     await fetch(`${API_BASE}/time/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(updated),
     });
 
     router.replace("/time");
@@ -181,7 +144,7 @@ export default function EditTime() {
         Edit Time Entry
       </Text>
 
-      {/* DATE */}
+      {/* 📅 START DATE */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -204,13 +167,17 @@ export default function EditTime() {
               mode="date"
               onChange={(e, selected) => {
                 setShowDate(false);
-                if (selected) setDate(selected.toLocaleDateString("en-CA"));
+                if (selected) {
+                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                  setDate(formatted);
+                }
               }}
             />
           )}
         </>
       ) : (
         <TextInput
+          placeholder="YYYY-MM-DD"
           value={date}
           onChangeText={setDate}
           style={{
@@ -223,7 +190,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* START TIME */}
+      {/* ⏱ START TIME */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -247,11 +214,9 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowStart(false);
                 if (selected) {
-                  const h = selected.getHours();
-                  const m = selected.getMinutes();
-
-                  const timeStr = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-                  setStartTime(timeStr);
+                  const h = selected.getHours().toString().padStart(2, "0");
+                  const m = selected.getMinutes().toString().padStart(2, "0");
+                  setStartTime(`${h}:${m}`);
                 }
               }}
             />
@@ -259,6 +224,7 @@ export default function EditTime() {
         </>
       ) : (
         <TextInput
+          placeholder="Start (HH:MM)"
           value={startTime}
           onChangeText={setStartTime}
           style={{
@@ -271,7 +237,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* END DATE */}
+      {/* 📅 END DATE (NEW) */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -294,13 +260,17 @@ export default function EditTime() {
               mode="date"
               onChange={(e, selected) => {
                 setShowEndDate(false);
-                if (selected) setEndDate(selected.toLocaleDateString("en-CA"));
+                if (selected) {
+                  const formatted = selected.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                  setEndDate(formatted);
+                }
               }}
             />
           )}
         </>
       ) : (
         <TextInput
+          placeholder="End Date (YYYY-MM-DD)"
           value={endDate}
           onChangeText={setEndDate}
           style={{
@@ -313,7 +283,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* END TIME */}
+      {/* ⏱ END TIME */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -337,11 +307,9 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEnd(false);
                 if (selected) {
-                  const h = selected.getHours();
-                  const m = selected.getMinutes();
-
-                  const timeStr = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-                  setEndTime(timeStr);
+                  const h = selected.getHours().toString().padStart(2, "0");
+                  const m = selected.getMinutes().toString().padStart(2, "0");
+                  setEndTime(`${h}:${m}`);
                 }
               }}
             />
@@ -349,6 +317,7 @@ export default function EditTime() {
         </>
       ) : (
         <TextInput
+          placeholder="End (HH:MM)"
           value={endTime}
           onChangeText={setEndTime}
           style={{
@@ -361,10 +330,52 @@ export default function EditTime() {
         />
       )}
 
+      {/* 🔍 JOB SEARCH */}
+      <TextInput
+        placeholder="Search Job..."
+        value={query}
+        onChangeText={searchJobs}
+        style={{
+          backgroundColor: isDark ? "#1e1e1e" : "#fff",
+          color: isDark ? "#fff" : "#000",
+          padding: 12,
+          borderRadius: 8,
+          marginBottom: 10,
+        }}
+      />
+
+      {results.map((item) => (
+        <TouchableOpacity
+          key={item.id}
+          onPress={() => {
+            setEntry({
+              ...entry,
+              job_code: item.code,
+              item_id: item.id,
+            });
+            setQuery(`${item.name} (${item.code})`);
+            setResults([]);
+          }}
+          style={{
+            padding: 10,
+            backgroundColor: isDark ? "#2a2a2a" : "#ddd",
+            marginBottom: 5,
+            borderRadius: 6,
+          }}
+        >
+          <Text style={{ color: isDark ? "#fff" : "#000" }}>{item.name}</Text>
+          <Text style={{ color: "#888" }}>{item.code}</Text>
+        </TouchableOpacity>
+      ))}
+
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
-        style={{ backgroundColor: "#4CAF50", padding: 15, borderRadius: 10 }}
+        style={{
+          backgroundColor: "#4CAF50",
+          padding: 15,
+          borderRadius: 10,
+        }}
       >
         <Text style={{ color: "#fff", textAlign: "center" }}>Save Changes</Text>
       </TouchableOpacity>
