@@ -233,6 +233,18 @@ export default function EditTime() {
           }}
         />
       )}
+      <TextInput
+        placeholder="Start (HH:MM)"
+        value={startTime}
+        onChangeText={setStartTime}
+        style={{
+          backgroundColor: isDark ? "#1e1e1e" : "#fff",
+          color: isDark ? "#fff" : "#000",
+          padding: 12,
+          borderRadius: 8,
+          marginBottom: 10,
+        }}
+      />
 
       {/* 📅 END DATE */}
       {Platform.OS !== "web" ? (
