@@ -211,9 +211,9 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       >
-        <Text style={{ color: isDark ? "#fff" : "#000" }}>
+        {/*<Text style={{ color: isDark ? "#fff" : "#000" }}>
           Start: {startTime || "Select Time"}
-        </Text>
+        </Text>*/}
       </TouchableOpacity>
 
       {showStart && (
@@ -258,9 +258,9 @@ export default function EditTime() {
               marginBottom: 10,
             }}
           >
-            {/*<Text style={{ color: isDark ? "#fff" : "#000" }}>
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
               End Date: {endDate || "Select Date"}
-            </Text>*/}
+            </Text>
           </TouchableOpacity>
 
           {showEndDate && (
