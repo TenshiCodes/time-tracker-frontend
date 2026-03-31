@@ -26,7 +26,7 @@ export default function EditTime() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
-  // ✅ REAL DATE OBJECTS (CRITICAL)
+  // ✅ REAL DATE OBJECTS (IMPORTANT)
   const [startDateObj, setStartDateObj] = useState(null);
   const [endDateObj, setEndDateObj] = useState(null);
 
@@ -43,6 +43,7 @@ export default function EditTime() {
     if (id) loadEntry();
   }, [id]);
 
+  // ✅ LOAD ENTRY (UTC → LOCAL)
   const loadEntry = async () => {
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
     const data = await res.json();
@@ -51,37 +52,34 @@ export default function EditTime() {
 
     if (data.date) setDate(data.date);
 
-    // ✅ CLOCK IN (UTC → LOCAL)
+    // CLOCK IN
     if (data.clock_in) {
       const local = new Date(data.clock_in);
 
       setStartDateObj(local);
 
-      const timeStr = local.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      setStartTime(timeStr);
-      console.log("⏱ CLOCK IN (LOCAL):", timeStr);
+      setStartTime(
+        local.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      );
     }
 
-    // ✅ CLOCK OUT
+    // CLOCK OUT
     if (data.clock_out) {
       const local = new Date(data.clock_out);
 
       setEndDateObj(local);
-      console.log("⏱ CLOCK OUT (LOCAL):", local);
 
-      const timeStr = local.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      setEndTime(
+        local.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      );
 
-      setEndTime(timeStr);
-      console.log("⏱ CLOCK OUT TIME (LOCAL):", timeStr);
-      const d = local.toLocaleDateString("en-CA");
-      setEndDate(d);
+      setEndDate(local.toLocaleDateString("en-CA"));
     }
 
     setQuery(data.job_code || "");
@@ -102,7 +100,7 @@ export default function EditTime() {
     setResults(data.slice(0, 3));
   };
 
-  // 💾 SAVE
+  // 💾 SAVE (LOCAL → UTC)
   const saveChanges = async () => {
     const payload = {
       date,
@@ -119,8 +117,6 @@ export default function EditTime() {
     });
 
     router.replace("/time");
-    console.log("END DATE OBJ:", endDateObj);
-    console.log("END DATE OBJ ISO:", endDateObj?.toISOString());
   };
 
   if (!entry) return null;
@@ -167,8 +163,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowDate(false);
                 if (selected) {
-                  const formatted = selected.toLocaleDateString("en-CA");
-                  setDate(formatted);
+                  setDate(selected.toLocaleDateString("en-CA"));
                 }
               }}
             />
@@ -215,12 +210,12 @@ export default function EditTime() {
                 if (selected) {
                   setStartDateObj(selected);
 
-                  const timeStr = selected.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
-
-                  setStartTime(timeStr);
+                  setStartTime(
+                    selected.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }),
+                  );
                 }
               }}
             />
@@ -235,13 +230,18 @@ export default function EditTime() {
 
             const [h, m] = text.split(":");
 
-            if (startDateObj && h && m) {
-              const updated = new Date(startDateObj);
+            if (date && h && m) {
+              const [y, mo, d] = date.split("-");
 
-              updated.setHours(Number(h));
-              updated.setMinutes(Number(m));
+              const local = new Date(
+                Number(y),
+                Number(mo) - 1,
+                Number(d),
+                Number(h),
+                Number(m),
+              );
 
-              setStartDateObj(updated);
+              setStartDateObj(local);
             }
           }}
           style={{
@@ -278,8 +278,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEndDate(false);
                 if (selected) {
-                  const formatted = selected.toLocaleDateString("en-CA");
-                  setEndDate(formatted);
+                  setEndDate(selected.toLocaleDateString("en-CA"));
                 }
               }}
             />
@@ -326,12 +325,12 @@ export default function EditTime() {
                 if (selected) {
                   setEndDateObj(selected);
 
-                  const timeStr = selected.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
-
-                  setEndTime(timeStr);
+                  setEndTime(
+                    selected.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }),
+                  );
                 }
               }}
             />
@@ -346,13 +345,18 @@ export default function EditTime() {
 
             const [h, m] = text.split(":");
 
-            if (endDateObj && h && m) {
-              const updated = new Date(endDateObj);
+            if (endDate && h && m) {
+              const [y, mo, d] = endDate.split("-");
 
-              updated.setHours(Number(h));
-              updated.setMinutes(Number(m));
+              const local = new Date(
+                Number(y),
+                Number(mo) - 1,
+                Number(d),
+                Number(h),
+                Number(m),
+              );
 
-              setEndDateObj(updated);
+              setEndDateObj(local);
             }
           }}
           style={{
