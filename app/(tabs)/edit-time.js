@@ -17,7 +17,8 @@ export default function EditTime() {
 
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
-
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
   const [entry, setEntry] = useState(null);
 
   const [startDateObj, setStartDateObj] = useState(null);
@@ -458,30 +459,43 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       />
+      {Array.isArray(results) &&
+        results.length > 0 &&
+        results.map((item, index) => {
+          if (!item) return null;
 
-      {results.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => {
-            setEntry({
-              ...entry,
-              job_code: item.code,
-              item_id: item.id,
-            });
-            setQuery(`${item.name} (${item.code})`);
-            setResults([]);
-          }}
-          style={{
-            padding: 10,
-            backgroundColor: isDark ? "#2a2a2a" : "#ddd",
-            marginBottom: 5,
-            borderRadius: 6,
-          }}
-        >
-          <Text style={{ color: isDark ? "#fff" : "#000" }}>{item.name}</Text>
-          <Text style={{ color: "#888" }}>{item.code}</Text>
-        </TouchableOpacity>
-      ))}
+          return (
+            <TouchableOpacity
+              key={item.id ?? index}
+              onPress={() => {
+                console.log("🟢 SELECTED ITEM:", item);
+
+                setEntry({
+                  ...(entry || {}),
+                  job_code: item.code || "",
+                  item_id: item.id ?? null,
+                });
+
+                setQuery(
+                  `${item.name || "Unknown"} (${item.code || "No Code"})`,
+                );
+
+                setResults([]);
+              }}
+              style={{
+                padding: 10,
+                backgroundColor: isDark ? "#2a2a2a" : "#ddd",
+                marginBottom: 5,
+                borderRadius: 6,
+              }}
+            >
+              <Text style={{ color: isDark ? "#fff" : "#000" }}>
+                {item.name || "No Name"}
+              </Text>
+              <Text style={{ color: "#888" }}>{item.code || "No Code"}</Text>
+            </TouchableOpacity>
+          );
+        })}
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
