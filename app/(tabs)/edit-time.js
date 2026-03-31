@@ -32,7 +32,27 @@ export default function EditTime() {
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const buildLocalDate = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr) return null;
 
+    const [y, mo, d] = dateStr.split("-");
+    const [h, m] = timeStr.split(":");
+
+    const local = new Date(
+      Number(y),
+      Number(mo) - 1,
+      Number(d),
+      Number(h),
+      Number(m),
+    );
+
+    console.log("🔥 BUILD LOCAL DATE");
+    console.log("INPUT:", dateStr, timeStr);
+    console.log("LOCAL:", local);
+    console.log("ISO:", local.toISOString());
+
+    return local;
+  };
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
@@ -47,24 +67,58 @@ export default function EditTime() {
     if (data.date) setDate(data.date);
 
     if (data.clock_in) {
-      const local = new Date(data.clock_in);
+      const utc = new Date(data.clock_in);
+
+      const local = new Date(
+        utc.getUTCFullYear(),
+        utc.getUTCMonth(),
+        utc.getUTCDate(),
+        utc.getUTCHours(),
+        utc.getUTCMinutes()
+      );
+
+      console.log("🔥 CLOCK IN FIX");
+      console.log("RAW:", data.clock_in);
+      console.log("LOCAL:", local);
+      console.log("HOURS:", local.getHours());
+
+      setStartDateObj(local);
+
       setStartTime(
-        local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        local.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
       );
     }
 
     if (data.clock_out) {
-      const local = new Date(data.clock_out);
+      const utc = new Date(data.clock_out);
+
+      const local = new Date(
+        utc.getUTCFullYear(),
+        utc.getUTCMonth(),
+        utc.getUTCDate(),
+        utc.getUTCHours(),
+        utc.getUTCMinutes()
+      );
+
+      console.log("🔥 CLOCK OUT FIX");
+      console.log("RAW:", data.clock_out);
+      console.log("LOCAL:", local);
+      console.log("HOURS:", local.getHours());
+
+      setEndDateObj(local);
 
       setEndTime(
-        local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        local.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
       );
 
       setEndDate(local.toLocaleDateString("en-CA"));
     }
-
-    setQuery(data.job_code || "");
-  };
 
   // 🔍 SEARCH JOBS
   const searchJobs = async (text) => {
@@ -96,7 +150,9 @@ export default function EditTime() {
       clock_in: start ? start.toISOString() : null,
       clock_out: end ? end.toISOString() : null,
     };
-
+    console.log("LOCAL DATE OBJ:", startDateObj);
+    console.log("LOCAL HOURS:", startDateObj.getHours());
+    console.log("UTC HOURS:", startDateObj.getUTCHours());
     console.log("💾 SAVING:", payload);
 
     await fetch(`${API_BASE}/time/${id}`, {
