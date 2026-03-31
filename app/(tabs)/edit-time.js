@@ -37,7 +37,19 @@ export default function EditTime() {
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
+  const searchJobs = async (text) => {
+    setQuery(text);
 
+    if (!text) {
+      setResults([]);
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/search?q=${text}`);
+    const data = await res.json();
+
+    setResults(data.slice(0, 3));
+  };
   // 🔥 FORCE UTC PARSE
   const parseUTC = (str) => {
     if (!str) return null;
@@ -63,19 +75,7 @@ export default function EditTime() {
 
     setEntry(data);
     // 🔍 SEARCH JOBS
-    const searchJobs = async (text) => {
-      setQuery(text);
 
-      if (!text) {
-        setResults([]);
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/search?q=${text}`);
-      const data = await res.json();
-
-      setResults(data.slice(0, 3));
-    };
     // ✅ START DATE
     if (data.clock_in) {
       const local = parseUTC(data.clock_in);
