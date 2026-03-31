@@ -74,7 +74,7 @@ export default function EditTime() {
         utc.getUTCMonth(),
         utc.getUTCDate(),
         utc.getUTCHours(),
-        utc.getUTCMinutes()
+        utc.getUTCMinutes(),
       );
 
       console.log("🔥 CLOCK IN FIX");
@@ -88,7 +88,7 @@ export default function EditTime() {
         local.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
-        })
+        }),
       );
     }
 
@@ -100,7 +100,7 @@ export default function EditTime() {
         utc.getUTCMonth(),
         utc.getUTCDate(),
         utc.getUTCHours(),
-        utc.getUTCMinutes()
+        utc.getUTCMinutes(),
       );
 
       console.log("🔥 CLOCK OUT FIX");
@@ -114,11 +114,14 @@ export default function EditTime() {
         local.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
-        })
+        }),
       );
 
       setEndDate(local.toLocaleDateString("en-CA"));
     }
+
+    setQuery(data.job_code || "");
+  };
 
   // 🔍 SEARCH JOBS
   const searchJobs = async (text) => {
