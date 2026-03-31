@@ -14,7 +14,8 @@ import { API_BASE } from "../../config";
 export default function EditTime() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-
+  const [startDateObj, setStartDateObj] = useState(null);
+  const [endDateObj, setEndDateObj] = useState(null);
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -66,21 +67,18 @@ export default function EditTime() {
 
     if (data.date) setDate(data.date);
 
+    // CLOCK IN
     if (data.clock_in) {
-      const utc = new Date(data.clock_in);
+      const fixed = data.clock_in.endsWith("Z")
+        ? data.clock_in
+        : data.clock_in + "Z"; // 🔥 FORCE UTC
 
-      const local = new Date(
-        utc.getUTCFullYear(),
-        utc.getUTCMonth(),
-        utc.getUTCDate(),
-        utc.getUTCHours(),
-        utc.getUTCMinutes(),
-      );
+      const local = new Date(fixed);
 
       console.log("🔥 CLOCK IN FIX");
       console.log("RAW:", data.clock_in);
+      console.log("FIXED:", fixed);
       console.log("LOCAL:", local);
-      console.log("HOURS:", local.getHours());
 
       setStartDateObj(local);
 
@@ -93,20 +91,16 @@ export default function EditTime() {
     }
 
     if (data.clock_out) {
-      const utc = new Date(data.clock_out);
+      const fixed = data.clock_out.endsWith("Z")
+        ? data.clock_out
+        : data.clock_out + "Z";
 
-      const local = new Date(
-        utc.getUTCFullYear(),
-        utc.getUTCMonth(),
-        utc.getUTCDate(),
-        utc.getUTCHours(),
-        utc.getUTCMinutes(),
-      );
+      const local = new Date(fixed);
 
       console.log("🔥 CLOCK OUT FIX");
       console.log("RAW:", data.clock_out);
+      console.log("FIXED:", fixed);
       console.log("LOCAL:", local);
-      console.log("HOURS:", local.getHours());
 
       setEndDateObj(local);
 
