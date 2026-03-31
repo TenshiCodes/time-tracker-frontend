@@ -151,11 +151,11 @@ export default function EditTime() {
         Edit Time Entry
       </Text>
 
-      {/* 📅 START DATE */}
+      {/* ⏱ START TIME */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
-            onPress={() => setShowDate(true)}
+            onPress={() => setShowStart(true)}
             style={{
               backgroundColor: isDark ? "#1e1e1e" : "#fff",
               padding: 15,
@@ -164,23 +164,32 @@ export default function EditTime() {
             }}
           >
             <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              Start Date: {date || "Select Date"}
+              Start: {startTime || "Select Time"}
             </Text>
           </TouchableOpacity>
 
-          {showDate && (
+          {showStart && (
             <DateTimePicker
               value={startDateObj || new Date()}
-              mode="date"
+              mode="time"
               onChange={(e, selected) => {
-                setShowDate(false);
-                if (selected) {
-                  console.log("📅 PICK START DATE:", selected.toString());
+                setShowStart(false);
+                if (selected && startDateObj) {
+                  console.log("🕐 PICK START:", selected.toString());
 
-                  setStartDateObj(selected);
+                  // 🔥 MERGE time into existing date
+                  const updated = new Date(startDateObj);
+                  updated.setHours(selected.getHours());
+                  updated.setMinutes(selected.getMinutes());
 
-                  const d = selected.toLocaleDateString("en-CA");
-                  setDate(d);
+                  console.log("✅ MERGED START:", updated.toString());
+
+                  setStartDateObj(updated);
+
+                  const h = updated.getHours().toString().padStart(2, "0");
+                  const m = updated.getMinutes().toString().padStart(2, "0");
+
+                  setStartTime(`${h}:${m}`);
                 }
               }}
             />
@@ -188,104 +197,25 @@ export default function EditTime() {
         </>
       ) : (
         <TextInput
-          placeholder="YYYY-MM-DD"
-          value={date}
-          onChangeText={setDate}
-          style={{
-            backgroundColor: isDark ? "#1e1e1e" : "#fff",
-            color: isDark ? "#fff" : "#000",
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 10,
+          placeholder="Start (HH:MM)"
+          value={startTime}
+          onChangeText={(text) => {
+            console.log("⌨️ WEB START:", text);
+
+            setStartTime(text);
+
+            if (!text.includes(":") || !startDateObj) return;
+
+            const [h, m] = text.split(":");
+
+            const updated = new Date(startDateObj);
+            updated.setHours(Number(h));
+            updated.setMinutes(Number(m));
+
+            console.log("🧠 UPDATED startDateObj:", updated.toString());
+
+            setStartDateObj(updated);
           }}
-        />
-      )}
-
-      {/* ⏱ START TIME */}
-      <TouchableOpacity
-        onPress={() => setShowStart(true)}
-        style={{
-          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-          padding: 15,
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
-      >
-        {/*<Text style={{ color: isDark ? "#fff" : "#000" }}>
-          Start: {startTime || "Select Time"}
-        </Text>*/}
-      </TouchableOpacity>
-
-      {showStart && (
-        <DateTimePicker
-          value={startDateObj || new Date()}
-          mode="time"
-          onChange={(e, selected) => {
-            setShowStart(false);
-            if (selected) {
-              setStartDateObj(selected);
-
-              const h = selected.getHours().toString().padStart(2, "0");
-              const m = selected.getMinutes().toString().padStart(2, "0");
-
-              setStartTime(`${h}:${m}`);
-            }
-          }}
-        />
-      )}
-      <TextInput
-        placeholder="Start (HH:MM)"
-        value={startTime}
-        onChangeText={setStartTime}
-        style={{
-          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-          color: isDark ? "#fff" : "#000",
-          padding: 12,
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-      />
-
-      {/* 📅 END DATE */}
-      {Platform.OS !== "web" ? (
-        <>
-          <TouchableOpacity
-            onPress={() => setShowEndDate(true)}
-            style={{
-              backgroundColor: isDark ? "#1e1e1e" : "#fff",
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 10,
-            }}
-          >
-            <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              End Date: {endDate || "Select Date"}
-            </Text>
-          </TouchableOpacity>
-
-          {showEndDate && (
-            <DateTimePicker
-              value={endDateObj || new Date()}
-              mode="date"
-              onChange={(e, selected) => {
-                setShowEndDate(false);
-                if (selected) {
-                  console.log("📅 PICK END DATE:", selected.toString());
-
-                  setEndDateObj(selected);
-
-                  const d = selected.toLocaleDateString("en-CA");
-                  setEndDate(d);
-                }
-              }}
-            />
-          )}
-        </>
-      ) : (
-        <TextInput
-          placeholder="YYYY-MM-DD"
-          value={endDate}
-          onChangeText={setEndDate}
           style={{
             backgroundColor: isDark ? "#1e1e1e" : "#fff",
             color: isDark ? "#fff" : "#000",
@@ -297,49 +227,79 @@ export default function EditTime() {
       )}
 
       {/* ⏱ END TIME */}
-      <TouchableOpacity
-        onPress={() => setShowEnd(true)}
-        style={{
-          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-          padding: 15,
-          borderRadius: 10,
-          marginBottom: 20,
-        }}
-      >
-        {/*<Text style={{ color: isDark ? "#fff" : "#000" }}>
-          End: {endTime || "Select Time"}
-        </Text>*/}
-      </TouchableOpacity>
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowEnd(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 20,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              End: {endTime || "Select Time"}
+            </Text>
+          </TouchableOpacity>
 
-      {showEnd && (
-        <DateTimePicker
-          value={endDateObj || new Date()}
-          mode="time"
-          onChange={(e, selected) => {
-            setShowEnd(false);
-            if (selected) {
-              setEndDateObj(selected);
+          {showEnd && (
+            <DateTimePicker
+              value={endDateObj || new Date()}
+              mode="time"
+              onChange={(e, selected) => {
+                setShowEnd(false);
+                if (selected && endDateObj) {
+                  console.log("🕐 PICK END:", selected.toString());
 
-              const h = selected.getHours().toString().padStart(2, "0");
-              const m = selected.getMinutes().toString().padStart(2, "0");
+                  // 🔥 MERGE time into existing date
+                  const updated = new Date(endDateObj);
+                  updated.setHours(selected.getHours());
+                  updated.setMinutes(selected.getMinutes());
 
-              setEndTime(`${h}:${m}`);
-            }
+                  console.log("✅ MERGED END:", updated.toString());
+
+                  setEndDateObj(updated);
+
+                  const h = updated.getHours().toString().padStart(2, "0");
+                  const m = updated.getMinutes().toString().padStart(2, "0");
+
+                  setEndTime(`${h}:${m}`);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="End (HH:MM)"
+          value={endTime}
+          onChangeText={(text) => {
+            console.log("⌨️ WEB END:", text);
+
+            setEndTime(text);
+
+            if (!text.includes(":") || !endDateObj) return;
+
+            const [h, m] = text.split(":");
+
+            const updated = new Date(endDateObj);
+            updated.setHours(Number(h));
+            updated.setMinutes(Number(m));
+
+            console.log("🧠 UPDATED endDateObj:", updated.toString());
+
+            setEndDateObj(updated);
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 20,
           }}
         />
       )}
-      <TextInput
-        placeholder="End (HH:MM)"
-        value={endTime}
-        onChangeText={setEndTime}
-        style={{
-          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-          color: isDark ? "#fff" : "#000",
-          padding: 12,
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-      />
 
       {/* SAVE */}
       <TouchableOpacity
