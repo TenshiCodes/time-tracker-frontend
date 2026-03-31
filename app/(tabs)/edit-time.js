@@ -119,6 +119,8 @@ export default function EditTime() {
     });
 
     router.replace("/time");
+    console.log("END DATE OBJ:", endDateObj);
+    console.log("END DATE OBJ ISO:", endDateObj?.toISOString());
   };
 
   if (!entry) return null;
