@@ -20,33 +20,23 @@ export default function EditTime() {
 
   const [entry, setEntry] = useState(null);
 
-  // ✅ STATES
   const [date, setDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-
-  // ✅ REAL DATE OBJECTS (IMPORTANT)
-  const [startDateObj, setStartDateObj] = useState(null);
-  const [endDateObj, setEndDateObj] = useState(null);
 
   const [showDate, setShowDate] = useState(false);
   const [showStart, setShowStart] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
 
-  // 🔍 JOB SEARCH
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
-  // ✅ DEBUG HERE (runs every render)
-  useEffect(() => {
-    console.log("START STATE:", startTime);
-    console.log("ENTRY RAW:", entry?.clock_in);
-  }, [startTime, entry]);
+
   // ✅ LOAD ENTRY (UTC → LOCAL)
   const loadEntry = async () => {
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
@@ -56,31 +46,18 @@ export default function EditTime() {
 
     if (data.date) setDate(data.date);
 
-    // CLOCK IN
     if (data.clock_in) {
       const local = new Date(data.clock_in);
-
-      setStartDateObj(local);
-
       setStartTime(
-        local.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       );
     }
 
-    // CLOCK OUT
     if (data.clock_out) {
       const local = new Date(data.clock_out);
 
-      setEndDateObj(local);
-
       setEndTime(
-        local.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       );
 
       setEndDate(local.toLocaleDateString("en-CA"));
@@ -92,24 +69,32 @@ export default function EditTime() {
   // 🔍 SEARCH JOBS
   const searchJobs = async (text) => {
     setQuery(text);
-
-    if (!text) {
-      setResults([]);
-      return;
-    }
+    if (!text) return setResults([]);
 
     const res = await fetch(`${API_BASE}/search?q=${text}`);
     const data = await res.json();
-
     setResults(data.slice(0, 3));
   };
 
-  // 💾 SAVE (LOCAL → UTC)
+  // ✅ BUILD LOCAL DATE (FIX)
+  const buildDateTime = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr) return null;
+
+    const [y, mo, d] = dateStr.split("-");
+    const [h, m] = timeStr.split(":");
+
+    return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(m));
+  };
+
+  // 💾 SAVE (FIXED)
   const saveChanges = async () => {
+    const start = buildDateTime(date, startTime);
+    const end = buildDateTime(endDate, endTime);
+
     const payload = {
       date,
-      clock_in: startDateObj ? startDateObj.toISOString() : null,
-      clock_out: endDateObj ? endDateObj.toISOString() : null,
+      clock_in: start ? start.toISOString() : null,
+      clock_out: end ? end.toISOString() : null,
     };
 
     console.log("💾 SAVING:", payload);
@@ -143,7 +128,7 @@ export default function EditTime() {
         Edit Time Entry
       </Text>
 
-      {/* 📅 START DATE */}
+      {/* DATE */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -166,16 +151,13 @@ export default function EditTime() {
               mode="date"
               onChange={(e, selected) => {
                 setShowDate(false);
-                if (selected) {
-                  setDate(selected.toLocaleDateString("en-CA"));
-                }
+                if (selected) setDate(selected.toLocaleDateString("en-CA"));
               }}
             />
           )}
         </>
       ) : (
         <TextInput
-          placeholder="YYYY-MM-DD"
           value={date}
           onChangeText={setDate}
           style={{
@@ -188,7 +170,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* ⏱ START TIME */}
+      {/* START TIME */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -207,19 +189,16 @@ export default function EditTime() {
 
           {showStart && (
             <DateTimePicker
-              value={startDateObj || new Date()}
+              value={new Date()}
               mode="time"
               onChange={(e, selected) => {
                 setShowStart(false);
                 if (selected) {
-                  setStartDateObj(selected);
+                  const h = selected.getHours();
+                  const m = selected.getMinutes();
 
-                  setStartTime(
-                    selected.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }),
-                  );
+                  const timeStr = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+                  setStartTime(timeStr);
                 }
               }}
             />
@@ -227,27 +206,8 @@ export default function EditTime() {
         </>
       ) : (
         <TextInput
-          placeholder="Start (HH:MM)"
           value={startTime}
-          onChangeText={(text) => {
-            setStartTime(text);
-
-            const [h, m] = text.split(":");
-
-            if (date && h && m) {
-              const [y, mo, d] = date.split("-");
-
-              const local = new Date(
-                Number(y),
-                Number(mo) - 1,
-                Number(d),
-                Number(h),
-                Number(m),
-              );
-
-              setStartDateObj(local);
-            }
-          }}
+          onChangeText={setStartTime}
           style={{
             backgroundColor: isDark ? "#1e1e1e" : "#fff",
             color: isDark ? "#fff" : "#000",
@@ -258,7 +218,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* 📅 END DATE */}
+      {/* END DATE */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -281,16 +241,13 @@ export default function EditTime() {
               mode="date"
               onChange={(e, selected) => {
                 setShowEndDate(false);
-                if (selected) {
-                  setEndDate(selected.toLocaleDateString("en-CA"));
-                }
+                if (selected) setEndDate(selected.toLocaleDateString("en-CA"));
               }}
             />
           )}
         </>
       ) : (
         <TextInput
-          placeholder="End Date (YYYY-MM-DD)"
           value={endDate}
           onChangeText={setEndDate}
           style={{
@@ -303,7 +260,7 @@ export default function EditTime() {
         />
       )}
 
-      {/* ⏱ END TIME */}
+      {/* END TIME */}
       {Platform.OS !== "web" ? (
         <>
           <TouchableOpacity
@@ -322,19 +279,16 @@ export default function EditTime() {
 
           {showEnd && (
             <DateTimePicker
-              value={endDateObj || new Date()}
+              value={new Date()}
               mode="time"
               onChange={(e, selected) => {
                 setShowEnd(false);
                 if (selected) {
-                  setEndDateObj(selected);
+                  const h = selected.getHours();
+                  const m = selected.getMinutes();
 
-                  setEndTime(
-                    selected.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }),
-                  );
+                  const timeStr = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+                  setEndTime(timeStr);
                 }
               }}
             />
@@ -342,27 +296,8 @@ export default function EditTime() {
         </>
       ) : (
         <TextInput
-          placeholder="End (HH:MM)"
           value={endTime}
-          onChangeText={(text) => {
-            setEndTime(text);
-
-            const [h, m] = text.split(":");
-
-            if (endDate && h && m) {
-              const [y, mo, d] = endDate.split("-");
-
-              const local = new Date(
-                Number(y),
-                Number(mo) - 1,
-                Number(d),
-                Number(h),
-                Number(m),
-              );
-
-              setEndDateObj(local);
-            }
-          }}
+          onChangeText={setEndTime}
           style={{
             backgroundColor: isDark ? "#1e1e1e" : "#fff",
             color: isDark ? "#fff" : "#000",
@@ -373,52 +308,10 @@ export default function EditTime() {
         />
       )}
 
-      {/* 🔍 JOB SEARCH */}
-      <TextInput
-        placeholder="Search Job..."
-        value={query}
-        onChangeText={searchJobs}
-        style={{
-          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-          color: isDark ? "#fff" : "#000",
-          padding: 12,
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-      />
-
-      {results.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => {
-            setEntry({
-              ...entry,
-              job_code: item.code,
-              item_id: item.id,
-            });
-            setQuery(`${item.name} (${item.code})`);
-            setResults([]);
-          }}
-          style={{
-            padding: 10,
-            backgroundColor: isDark ? "#2a2a2a" : "#ddd",
-            marginBottom: 5,
-            borderRadius: 6,
-          }}
-        >
-          <Text style={{ color: isDark ? "#fff" : "#000" }}>{item.name}</Text>
-          <Text style={{ color: "#888" }}>{item.code}</Text>
-        </TouchableOpacity>
-      ))}
-
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
-        style={{
-          backgroundColor: "#4CAF50",
-          padding: 15,
-          borderRadius: 10,
-        }}
+        style={{ backgroundColor: "#4CAF50", padding: 15, borderRadius: 10 }}
       >
         <Text style={{ color: "#fff", textAlign: "center" }}>Save Changes</Text>
       </TouchableOpacity>
