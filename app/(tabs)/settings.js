@@ -18,16 +18,18 @@ const exportData = async () => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const url = `${API_BASE}/export/time?tz=${encodeURIComponent(tz)}`;
 
-    // 🌐 WEB
+    console.log("📤 EXPORT URL:", url);
+
     if (Platform.OS === "web") {
       window.open(url, "_blank");
       return;
     }
 
-    // 📱 MOBILE
     const fileUri = FileSystem.documentDirectory + "time_entries.xlsx";
 
     const download = await FileSystem.downloadAsync(url, fileUri);
+
+    console.log("📥 DOWNLOAD RESULT:", download);
 
     const isAvailable = await Sharing.isAvailableAsync();
     if (!isAvailable) {
@@ -37,7 +39,7 @@ const exportData = async () => {
 
     await Sharing.shareAsync(download.uri);
   } catch (err) {
-    console.error("Export failed:", err);
+    console.error("❌ Export failed:", err);
   }
 };
 export default function Settings() {
@@ -118,18 +120,29 @@ export default function Settings() {
     try {
       const storedUser = await AsyncStorage.getItem("user");
       const user = JSON.parse(storedUser);
+
+      console.log("📧 USER:", user);
+
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      await fetch(
-        `${API_BASE}/export/email/${user.id}?tz=${encodeURIComponent(tz)}`,
-        {
-          method: "POST",
-        },
+      const res = await fetch(
+        `${API_BASE}/export/email/${user?.id}?tz=${encodeURIComponent(tz)}`,
+        { method: "POST" },
       );
+
+      const text = await res.text(); // 👈 important
+
+      console.log("📧 RESPONSE STATUS:", res.status);
+      console.log("📧 RESPONSE BODY:", text);
+
+      if (!res.ok) {
+        alert("Server error sending email");
+        return;
+      }
 
       alert("📧 Email sent!");
     } catch (err) {
-      console.error(err);
+      console.error("❌ Email export error:", err);
       alert("Failed to send email");
     }
   };
