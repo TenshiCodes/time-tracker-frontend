@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
   // 🌐 Production (web + mobile)
   if (typeof window !== "undefined") {
-    return "https://shake-spas-supporters-somewhere.trycloudflare.com/";
+    return "https://shake-spas-supporters-somewhere.trycloudflare.com";
   }
 
   // 📱 Expo dev (local testing)
