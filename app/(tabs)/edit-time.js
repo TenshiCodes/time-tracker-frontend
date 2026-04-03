@@ -50,17 +50,16 @@ export default function EditTime() {
 
     setResults(data.slice(0, 3));
   };
-  // 🔥 FORCE UTC PARSE
   const parseUTC = (str) => {
     if (!str) return null;
 
-    const fixed = str.endsWith("Z") ? str : str + "Z";
-    const d = new Date(fixed);
+    // normalize space → T (safe)
+    const normalized = str.replace(" ", "T");
 
-    console.log("🧪 PARSE UTC");
+    const d = new Date(normalized);
+
     console.log("RAW:", str);
-    console.log("FIXED:", fixed);
-    console.log("LOCAL:", d.toString());
+    console.log("PARSED:", d.toString());
 
     return d;
   };

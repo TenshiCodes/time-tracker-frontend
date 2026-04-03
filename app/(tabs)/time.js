@@ -41,7 +41,7 @@ export default function Time() {
       console.log("SYNC STATUS:", data);
 
       if (data.clocked_in && data.clock_in) {
-        const time = new Date(data.clock_in.replace(" ", "T") + "Z");
+        const time = new Date(data.clock_in.replace(" ", "T"));
 
         if (isNaN(time.getTime())) {
           console.log("INVALID DATE FROM API:", data.clock_in);
@@ -104,7 +104,7 @@ export default function Time() {
         const data = await res.json();
 
         if (data.clocked_in && data.clock_in) {
-          const time = new Date(data.clock_in.replace(" ", "T") + "Z");
+          const time = new Date(data.clock_in.replace(" ", "T"));
 
           if (isNaN(time.getTime())) {
             console.log("INVALID DATE INIT:", data.clock_in);
