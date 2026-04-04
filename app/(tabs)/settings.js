@@ -192,7 +192,7 @@ export default function Settings() {
         />
       </View>
 
-      {/* 📱 SMS */}
+      {/* 📱 SMS 
       <View>
         <Text style={{ color: isDark ? "#fff" : "#000" }}>
           SMS Notifications
@@ -209,16 +209,16 @@ export default function Settings() {
             ? "You will receive SMS alerts when new tickets are submitted."
             : "You will receive SMS updates when your ticket is approved or denied."}
         </Text>
-
+        
         <Switch
           value={phoneNotif}
           onValueChange={(value) => {
-            console.log("📱 SMS TOGGLED:", value); // ✅ HERE
+            console.log("📱 SMS TOGGLED:", value); 
             setPhoneNotif(value);
             saveSettings(emailNotif, value);
-          }}
+          }} 
         />
-      </View>
+      </View>*/}
       <TouchableOpacity
         onPress={exportData}
         style={{
