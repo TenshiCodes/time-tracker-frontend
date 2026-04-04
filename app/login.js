@@ -29,6 +29,7 @@ export default function Login() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     try {
@@ -43,7 +44,11 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        Alert.alert("Login Failed", data.detail);
+        const message = data.detail || "Login failed";
+
+        setError(message); // ✅ shows on web + mobile UI
+        Alert.alert("Login Failed", message); // ✅ still pops on mobile
+
         return;
       }
 
@@ -86,7 +91,10 @@ export default function Login() {
         placeholder="Username"
         placeholderTextColor={colors.placeholder}
         value={username}
-        onChangeText={setUsername}
+        onChangeText={(text) => {
+          setUsername(text);
+          setError("");
+        }}
         style={{
           borderWidth: 1,
           borderColor: colors.border,
@@ -103,7 +111,10 @@ export default function Login() {
         placeholderTextColor={colors.placeholder}
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          setError("");
+        }}
         style={{
           borderWidth: 1,
           borderColor: colors.border,
@@ -114,7 +125,11 @@ export default function Login() {
           backgroundColor: colors.card,
         }}
       />
-
+      {error ? (
+        <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
+          {error}
+        </Text>
+      ) : null}
       <TouchableOpacity
         onPress={handleLogin}
         style={{
