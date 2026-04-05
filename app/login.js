@@ -1,12 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { Image } from "react-native";
+
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert, Image, Text,
+  Alert,
+  Text,
   TextInput,
   TouchableOpacity,
   useColorScheme,
-  View
+  View,
 } from "react-native";
 import { API_BASE } from "../config";
 
@@ -83,7 +87,7 @@ export default function Login() {
         }}
       >
         <Image
-          source={require("../assets/images/logo-white-pbe.png")}
+          source={require("../assets/images/logo_white_pbe.png")}
           style={{ width: 50, height: 50, resizeMode: "contain" }}
         />
       </View>
