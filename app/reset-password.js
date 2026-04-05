@@ -1,19 +1,21 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  useColorScheme,
-  View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    useColorScheme,
+    View,
 } from "react-native";
 import { API_BASE } from "../config";
 
-export default function Login() {
+export default function ResetPassword() {
+  const { token } = useLocalSearchParams();
   const router = useRouter();
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
@@ -25,46 +27,35 @@ export default function Login() {
     border: isDark ? "#333" : "#ccc",
     placeholder: isDark ? "#aaa" : "#666",
     button: "#4CAF50",
+    error: isDark ? "#ff6b6b" : "red",
   };
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleLogin = async () => {
+  const handleReset = async () => {
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     try {
-      const res = await fetch(`${API_BASE}/login`, {
+      const res = await fetch(`${API_BASE}/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ token, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        const message = data.detail || "Login failed";
-
-        setError(message); // ✅ shows on web + mobile UI
-        Alert.alert("Login Failed", message); // ✅ still pops on mobile
-
+        setError(data.detail || "Something went wrong");
         return;
       }
 
-      // ✅ SAVE USER SESSION
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify({
-          username: data.username,
-          role: data.role,
-          id: data.id, // ✅ MUST MATCH BACKEND
-        }),
-      );
-      console.log("STORING USER:", data);
-      router.replace("/(tabs)");
+      setError("");
+      alert("Password updated!");
+      router.replace("/login");
     } catch (err) {
-      Alert.alert("Error", "Network error");
+      setError("Network error");
     }
   };
 
@@ -84,29 +75,11 @@ export default function Login() {
           color: colors.text,
         }}
       >
-        Login
+        Reset Password
       </Text>
 
       <TextInput
-        placeholder="Username"
-        placeholderTextColor={colors.placeholder}
-        value={username}
-        onChangeText={(text) => {
-          setUsername(text);
-          setError("");
-        }}
-        style={{
-          borderWidth: 1,
-          borderColor: colors.border,
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-          color: colors.text,
-          backgroundColor: colors.card,
-        }}
-      />
-      <TextInput
-        placeholder="Password"
+        placeholder="New Password"
         placeholderTextColor={colors.placeholder}
         secureTextEntry
         value={password}
@@ -124,23 +97,33 @@ export default function Login() {
           backgroundColor: colors.card,
         }}
       />
+      <TextInput
+        placeholder="Confirm Password"
+        placeholderTextColor={colors.placeholder}
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={(text) => {
+          setConfirmPassword(text);
+          setError("");
+        }}
+        style={{
+          borderWidth: 1,
+          borderColor: colors.border,
+          padding: 12,
+          marginBottom: 12,
+          borderRadius: 8,
+          color: colors.text,
+          backgroundColor: colors.card,
+        }}
+      />
 
-      {/* ✅ Forgot Password link */}
-      <TouchableOpacity
-        onPress={() => router.push("/forgot-password")}
-        style={{ alignSelf: "flex-end", marginBottom: 10 }}
-      >
-        <Text style={{ color: colors.button }}>Forgot Password?</Text>
-      </TouchableOpacity>
-
+      {/* ✅ Error Message */}
       {error ? (
-        <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
-          {error}
-        </Text>
+        <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
       ) : null}
 
       <TouchableOpacity
-        onPress={handleLogin}
+        onPress={handleReset}
         style={{
           backgroundColor: colors.button,
           padding: 15,
@@ -148,14 +131,8 @@ export default function Login() {
           marginTop: 10,
         }}
       >
-        <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => router.push("/create-user")}
-        style={{ marginTop: 15 }}
-      >
-        <Text style={{ color: "#4CAF50", textAlign: "center" }}>
-          Create Account
+        <Text style={{ color: "#fff", textAlign: "center" }}>
+          Reset Password
         </Text>
       </TouchableOpacity>
     </View>
