@@ -1,11 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { Image } from "react-native";
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   Text,
   TextInput,
   TouchableOpacity,
@@ -86,10 +85,14 @@ export default function Login() {
           backgroundColor: colors.background, // 👈 blends perfectly
         }}
       >
-        <Image
-          source={require("../assets/images/logo_white_pbe.png")}
-          style={{ width: 50, height: 50, resizeMode: "contain" }}
-        />
+        <TouchableOpacity
+          onPress={() => Linking.openURL("https://pacificblueengineering.com")}
+        >
+          <Image
+            source={require("../assets/images/logo_white_pbe.png")}
+            style={{ width: 50, height: 50, resizeMode: "contain" }}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* 🔥 CONTENT */}

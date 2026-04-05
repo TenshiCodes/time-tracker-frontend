@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+    Image,
     Text,
     TextInput,
     TouchableOpacity,
@@ -56,11 +57,27 @@ export default function ForgotPassword() {
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        padding: 20,
         backgroundColor: colors.background,
       }}
     >
+      {/* 🔥 HEADER (LOGO) */}
+      <View
+        style={{
+          height: 80,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.background, // 👈 blends perfectly
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => Linking.openURL("https://pacificblueengineering.com")}
+        >
+          <Image
+            source={require("../assets/images/logo_white_pbe.png")}
+            style={{ width: 50, height: 50, resizeMode: "contain" }}
+          />
+        </TouchableOpacity>
+      </View>
       {/* 🔥 HEADER ROW */}
       <View
         style={{
