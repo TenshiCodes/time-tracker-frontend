@@ -14,9 +14,9 @@ export default function RootLayout() {
           height: 70,
           justifyContent: "center",
           paddingHorizontal: 15,
-          backgroundColor: isDark ? "#0b0b0b" : "#f5f5f5",
+          backgroundColor: isDark ? "#fff" : "#000",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#222" : "#ddd",
+          borderBottomColor: isDark ? "#fff" : "#000",
         }}
       >
         <TouchableOpacity onPress={() => router.push("/")}>
