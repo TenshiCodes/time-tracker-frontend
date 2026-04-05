@@ -7,7 +7,7 @@ export default function RootLayout() {
   const isDark = scheme === "dark";
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#fff" : "#000" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#000" : "#fff" }}>
       {/* 🔥 HEADER */}
       <View
         style={{
@@ -15,6 +15,8 @@ export default function RootLayout() {
           justifyContent: "center",
           paddingHorizontal: 15,
           borderBottomWidth: 1,
+          backgroundColor: isDark ? "#0b0b0b" : "#ffffff",
+          borderBottomColor: isDark ? "#222" : "#ddd",
         }}
       >
         <TouchableOpacity onPress={() => router.push("/")}>
