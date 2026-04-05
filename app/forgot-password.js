@@ -103,7 +103,13 @@ export default function ForgotPassword() {
             marginBottom: 25,
           }}
         >
-          <Text style={{ fontSize: 28, color: colors.text }}>
+          <Text
+            style={{
+              fontSize: 28,
+              marginBottom: 20,
+              color: colors.text,
+            }}
+          >
             Forgot Password
           </Text>
 
@@ -127,9 +133,9 @@ export default function ForgotPassword() {
           style={{
             borderWidth: 1,
             borderColor: colors.border,
-            padding: 14,
-            marginBottom: 15,
-            borderRadius: 10,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
             color: colors.text,
             backgroundColor: colors.card,
           }}
