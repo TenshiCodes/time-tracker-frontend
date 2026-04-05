@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
     Image,
+    Linking,
     Text,
     TextInput,
     TouchableOpacity,
@@ -70,7 +71,15 @@ export default function ForgotPassword() {
         }}
       >
         <TouchableOpacity
-          onPress={() => Linking.openURL("https://pacificblueengineering.com")}
+          onPress={async () => {
+            const url = "https://pacificblueengineering.com";
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+              await Linking.openURL(url);
+            } else {
+              console.log("Can't open URL:", url);
+            }
+          }}
         >
           <Image
             source={require("../assets/images/logo_white_pbe.png")}
