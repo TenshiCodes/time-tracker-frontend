@@ -72,92 +72,115 @@ export default function Login() {
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        padding: 20,
         backgroundColor: colors.background,
       }}
     >
-      <Text
+      {/* 🔥 HEADER (LOGO) */}
+      <View
         style={{
-          fontSize: 28,
-          marginBottom: 20,
-          color: colors.text,
+          height: 80,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.background, // 👈 blends perfectly
         }}
       >
-        Login
-      </Text>
+        <Image
+          source={require("../assets/images/logo_white_pbe.png")}
+          style={{ width: 50, height: 50, resizeMode: "contain" }}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Username"
-        placeholderTextColor={colors.placeholder}
-        value={username}
-        onChangeText={(text) => {
-          setUsername(text);
-          setError("");
-        }}
+      {/* 🔥 CONTENT */}
+      <View
         style={{
-          borderWidth: 1,
-          borderColor: colors.border,
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-          color: colors.text,
-          backgroundColor: colors.card,
+          flex: 1,
+          justifyContent: "center",
+          padding: 20,
         }}
-      />
-      <TextInput
-        placeholder="Password"
-        placeholderTextColor={colors.placeholder}
-        secureTextEntry
-        value={password}
-        onChangeText={(text) => {
-          setPassword(text);
-          setError("");
-        }}
-        style={{
-          borderWidth: 1,
-          borderColor: colors.border,
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-          color: colors.text,
-          backgroundColor: colors.card,
-        }}
-      />
-
-      {/* ✅ Forgot Password link */}
-      <TouchableOpacity
-        onPress={() => router.push("/forgot-password")}
-        style={{ alignSelf: "flex-end", marginBottom: 10 }}
       >
-        <Text style={{ color: colors.button }}>Forgot Password?</Text>
-      </TouchableOpacity>
-
-      {error ? (
-        <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
-          {error}
+        <Text
+          style={{
+            fontSize: 28,
+            marginBottom: 20,
+            color: colors.text,
+          }}
+        >
+          Login
         </Text>
-      ) : null}
 
-      <TouchableOpacity
-        onPress={handleLogin}
-        style={{
-          backgroundColor: colors.button,
-          padding: 15,
-          borderRadius: 8,
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => router.push("/create-user")}
-        style={{ marginTop: 15 }}
-      >
-        <Text style={{ color: "#4CAF50", textAlign: "center" }}>
-          Create Account
-        </Text>
-      </TouchableOpacity>
+        <TextInput
+          placeholder="Username"
+          placeholderTextColor={colors.placeholder}
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
+
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={colors.placeholder}
+          secureTextEntry
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
+
+        <TouchableOpacity
+          onPress={() => router.push("/forgot-password")}
+          style={{ alignSelf: "flex-end", marginBottom: 10 }}
+        >
+          <Text style={{ color: colors.button }}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        {error ? (
+          <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
+            {error}
+          </Text>
+        ) : null}
+
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={{
+            backgroundColor: colors.button,
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 10,
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/create-user")}
+          style={{ marginTop: 15 }}
+        >
+          <Text style={{ color: "#4CAF50", textAlign: "center" }}>
+            Create Account
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
