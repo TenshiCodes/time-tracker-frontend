@@ -67,7 +67,14 @@ export default function ForgotPassword() {
       >
         Forgot Password
       </Text>
-
+      {/* BACK BUTTON (TOP RIGHT) */}
+      <TouchableOpacity onPress={() => router.replace("/login")}>
+        <Ionicons
+          name="arrow-back-circle"
+          size={32}
+          color={isDark ? "#fff" : "#000"}
+        />
+      </TouchableOpacity>
       <TextInput
         placeholder="Username or Email"
         placeholderTextColor={colors.placeholder}
