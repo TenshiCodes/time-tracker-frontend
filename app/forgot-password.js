@@ -59,13 +59,12 @@ export default function ForgotPassword() {
       style={{
         flex: 1,
         backgroundColor: colors.background,
-        justifyContent: "center", // 👈 THIS is the key
       }}
     >
-      {/* 🔥 HEADER (LOGO) */}
+      {/* 🔥 HEADER (ALWAYS TOP) */}
       <View
         style={{
-          height: 90,
+          height: 80,
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -79,70 +78,79 @@ export default function ForgotPassword() {
         >
           <Image
             source={require("../assets/images/logo_white_pbe.png")}
-            style={{ width: 55, height: 55, resizeMode: "contain" }}
+            style={{ width: 50, height: 50, resizeMode: "contain" }}
           />
         </TouchableOpacity>
       </View>
 
-      {/* HEADER ROW */}
+      {/* 🔥 CONTENT (CENTERED ONLY THIS PART) */}
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 25,
+          flex: 1,
+          justifyContent: "center", // 👈 ONLY here
+          paddingHorizontal: 20,
+          maxWidth: 500,
+          width: "100%",
+          alignSelf: "center",
         }}
       >
-        <Text
+        {/* HEADER ROW */}
+        <View
           style={{
-            fontSize: 28,
-            color: colors.text,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 25,
           }}
         >
-          Forgot Password
-        </Text>
+          <Text style={{ fontSize: 28, color: colors.text }}>
+            Forgot Password
+          </Text>
 
-        <TouchableOpacity onPress={() => router.replace("/login")}>
-          <Ionicons name="arrow-back-circle" size={32} color={colors.text} />
+          <TouchableOpacity onPress={() => router.replace("/login")}>
+            <Ionicons
+              name="arrow-back-circle"
+              size={32}
+              color={isDark ? "#fff" : "#000"}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TextInput
+          placeholder="Username or Email"
+          placeholderTextColor={colors.placeholder}
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 14,
+            marginBottom: 15,
+            borderRadius: 10,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
+
+        {error ? (
+          <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
+        ) : null}
+
+        <TouchableOpacity
+          onPress={handleReset}
+          style={{
+            backgroundColor: colors.button,
+            padding: 16,
+            borderRadius: 10,
+            marginTop: 10,
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>Send Reset</Text>
         </TouchableOpacity>
       </View>
-
-      {/* INPUT */}
-      <TextInput
-        placeholder="Username or Email"
-        placeholderTextColor={colors.placeholder}
-        value={username}
-        onChangeText={(text) => {
-          setUsername(text);
-          setError("");
-        }}
-        style={{
-          borderWidth: 1,
-          borderColor: colors.border,
-          padding: 14,
-          marginBottom: 15,
-          borderRadius: 10,
-          color: colors.text,
-          backgroundColor: colors.card,
-        }}
-      />
-
-      {error ? (
-        <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
-      ) : null}
-
-      {/* BUTTON */}
-      <TouchableOpacity
-        onPress={handleReset}
-        style={{
-          backgroundColor: colors.button,
-          padding: 16,
-          borderRadius: 10,
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>Send Reset</Text>
-      </TouchableOpacity>
     </View>
   );
 }
