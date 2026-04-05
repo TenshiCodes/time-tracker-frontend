@@ -59,7 +59,7 @@ export default function ForgotPassword() {
       style={{
         flex: 1,
         backgroundColor: colors.background,
-        paddingHorizontal: 20, // 👈 THIS replaces centering
+        justifyContent: "center", // 👈 THIS is the key
       }}
     >
       {/* 🔥 HEADER (LOGO) */}
