@@ -1,29 +1,37 @@
 import { Stack, useRouter } from "expo-router";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View, useColorScheme } from "react-native";
 
 export default function RootLayout() {
   const router = useRouter();
+  const scheme = useColorScheme();
+  const isDark = scheme === "dark";
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* 🔥 HEADER (LOGO ONLY) */}
+    <View style={{ flex: 1, backgroundColor: isDark ? "#000" : "#fff" }}>
+      {/* 🔥 HEADER */}
       <View
         style={{
           height: 70,
           justifyContent: "center",
           paddingHorizontal: 15,
-          backgroundColor: "#0b0b0b",
+          backgroundColor: isDark ? "#0b0b0b" : "#f5f5f5",
+          borderBottomWidth: 1,
+          borderBottomColor: isDark ? "#222" : "#ddd",
         }}
       >
         <TouchableOpacity onPress={() => router.push("/")}>
           <Image
-            source={require("../assets/images/logo_white_pbe.png")}
+            source={
+              isDark
+                ? require("../assets/images/logo_white_pbe.png") // white logo
+                : require("../assets/images/logo_white_pbe.png") // swap later if you add dark logo
+            }
             style={{ width: 45, height: 45, resizeMode: "contain" }}
           />
         </TouchableOpacity>
       </View>
 
-      {/* 🔥 YOUR STACK */}
+      {/* 🔥 NAVIGATION */}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" />
         <Stack.Screen name="(tabs)" />
