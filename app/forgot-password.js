@@ -59,7 +59,7 @@ export default function ForgotPassword() {
       style={{
         flex: 1,
         backgroundColor: colors.background,
-        alignItems: "center", // 👈 centers content on web
+        paddingHorizontal: 20, // 👈 THIS replaces centering
       }}
     >
       {/* 🔥 HEADER (LOGO) */}
@@ -68,7 +68,6 @@ export default function ForgotPassword() {
           height: 90,
           justifyContent: "center",
           alignItems: "center",
-          width: "100%",
         }}
       >
         <TouchableOpacity
@@ -85,84 +84,65 @@ export default function ForgotPassword() {
         </TouchableOpacity>
       </View>
 
-      {/* 🔥 CONTENT CARD */}
+      {/* HEADER ROW */}
       <View
         style={{
-          width: "100%",
-          maxWidth: 500, // 👈 keeps it clean on desktop
-          paddingHorizontal: 20,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 25,
         }}
       >
-        {/* HEADER ROW */}
-        <View
+        <Text
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 25,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 26,
-              fontWeight: "600",
-              color: colors.text,
-            }}
-          >
-            Forgot Password
-          </Text>
-
-          <TouchableOpacity onPress={() => router.replace("/login")}>
-            <Ionicons name="arrow-back-circle" size={32} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-
-        {/* INPUT */}
-        <TextInput
-          placeholder="Username or Email"
-          placeholderTextColor={colors.placeholder}
-          value={username}
-          onChangeText={(text) => {
-            setUsername(text);
-            setError("");
-          }}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 14,
-            marginBottom: 15,
-            borderRadius: 10,
+            fontSize: 28,
             color: colors.text,
-            backgroundColor: colors.card,
-          }}
-        />
-
-        {/* ERROR */}
-        {error ? (
-          <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
-        ) : null}
-
-        {/* BUTTON */}
-        <TouchableOpacity
-          onPress={handleReset}
-          style={{
-            backgroundColor: colors.button,
-            padding: 16,
-            borderRadius: 10,
-            marginTop: 10,
           }}
         >
-          <Text
-            style={{
-              color: "#fff",
-              textAlign: "center",
-              fontWeight: "600",
-            }}
-          >
-            Send Reset
-          </Text>
+          Forgot Password
+        </Text>
+
+        <TouchableOpacity onPress={() => router.replace("/login")}>
+          <Ionicons name="arrow-back-circle" size={32} color={colors.text} />
         </TouchableOpacity>
       </View>
+
+      {/* INPUT */}
+      <TextInput
+        placeholder="Username or Email"
+        placeholderTextColor={colors.placeholder}
+        value={username}
+        onChangeText={(text) => {
+          setUsername(text);
+          setError("");
+        }}
+        style={{
+          borderWidth: 1,
+          borderColor: colors.border,
+          padding: 14,
+          marginBottom: 15,
+          borderRadius: 10,
+          color: colors.text,
+          backgroundColor: colors.card,
+        }}
+      />
+
+      {error ? (
+        <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
+      ) : null}
+
+      {/* BUTTON */}
+      <TouchableOpacity
+        onPress={handleReset}
+        style={{
+          backgroundColor: colors.button,
+          padding: 16,
+          borderRadius: 10,
+          marginTop: 10,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Send Reset</Text>
+      </TouchableOpacity>
     </View>
   );
 }
