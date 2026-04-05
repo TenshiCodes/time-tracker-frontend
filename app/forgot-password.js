@@ -61,23 +61,33 @@ export default function ForgotPassword() {
         backgroundColor: colors.background,
       }}
     >
-      <Text
+      {/* 🔥 HEADER ROW */}
+      <View
         style={{
-          fontSize: 28,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
           marginBottom: 20,
-          color: colors.text,
         }}
       >
-        Forgot Password
-      </Text>
-      {/* BACK BUTTON (TOP RIGHT) */}
-      <TouchableOpacity onPress={() => router.replace("/login")}>
-        <Ionicons
-          name="arrow-back-circle"
-          size={32}
-          color={isDark ? "#fff" : "#000"}
-        />
-      </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 28,
+            color: colors.text,
+          }}
+        >
+          Forgot Password
+        </Text>
+
+        <TouchableOpacity onPress={() => router.replace("/login")}>
+          <Ionicons
+            name="arrow-back-circle"
+            size={32}
+            color={isDark ? "#fff" : "#000"}
+          />
+        </TouchableOpacity>
+      </View>
+
       <TextInput
         placeholder="Username or Email"
         placeholderTextColor={colors.placeholder}
