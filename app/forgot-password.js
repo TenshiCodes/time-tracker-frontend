@@ -97,9 +97,9 @@ export default function ForgotPassword() {
         {/* HEADER ROW */}
         <View
           style={{
-            flex: 1,
-            justifyContent: "center",
-            padding: 20,
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 25,
           }}
         >
           <Text style={{ fontSize: 28, color: colors.text }}>
