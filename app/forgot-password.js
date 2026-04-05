@@ -59,96 +59,110 @@ export default function ForgotPassword() {
       style={{
         flex: 1,
         backgroundColor: colors.background,
+        alignItems: "center", // 👈 centers content on web
       }}
     >
       {/* 🔥 HEADER (LOGO) */}
       <View
         style={{
-          height: 80,
+          height: 90,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: colors.background, // 👈 blends perfectly
+          width: "100%",
         }}
       >
         <TouchableOpacity
           onPress={async () => {
             const url = "https://pacificblueengineering.com";
             const supported = await Linking.canOpenURL(url);
-            if (supported) {
-              await Linking.openURL(url);
-            } else {
-              console.log("Can't open URL:", url);
-            }
+            if (supported) await Linking.openURL(url);
           }}
         >
           <Image
             source={require("../assets/images/logo_white_pbe.png")}
-            style={{ width: 50, height: 50, resizeMode: "contain" }}
+            style={{ width: 55, height: 55, resizeMode: "contain" }}
           />
         </TouchableOpacity>
       </View>
-      {/* 🔥 HEADER ROW */}
+
+      {/* 🔥 CONTENT CARD */}
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 20,
+          width: "100%",
+          maxWidth: 500, // 👈 keeps it clean on desktop
+          paddingHorizontal: 20,
         }}
       >
-        <Text
+        {/* HEADER ROW */}
+        <View
           style={{
-            fontSize: 28,
-            color: colors.text,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 25,
           }}
         >
-          Forgot Password
-        </Text>
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: "600",
+              color: colors.text,
+            }}
+          >
+            Forgot Password
+          </Text>
 
-        <TouchableOpacity onPress={() => router.replace("/login")}>
-          <Ionicons
-            name="arrow-back-circle"
-            size={32}
-            color={isDark ? "#fff" : "#000"}
-          />
+          <TouchableOpacity onPress={() => router.replace("/login")}>
+            <Ionicons name="arrow-back-circle" size={32} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+
+        {/* INPUT */}
+        <TextInput
+          placeholder="Username or Email"
+          placeholderTextColor={colors.placeholder}
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 14,
+            marginBottom: 15,
+            borderRadius: 10,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
+
+        {/* ERROR */}
+        {error ? (
+          <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
+        ) : null}
+
+        {/* BUTTON */}
+        <TouchableOpacity
+          onPress={handleReset}
+          style={{
+            backgroundColor: colors.button,
+            padding: 16,
+            borderRadius: 10,
+            marginTop: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: "#fff",
+              textAlign: "center",
+              fontWeight: "600",
+            }}
+          >
+            Send Reset
+          </Text>
         </TouchableOpacity>
       </View>
-
-      <TextInput
-        placeholder="Username or Email"
-        placeholderTextColor={colors.placeholder}
-        value={username}
-        onChangeText={(text) => {
-          setUsername(text);
-          setError("");
-        }}
-        style={{
-          borderWidth: 1,
-          borderColor: colors.border,
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-          color: colors.text,
-          backgroundColor: colors.card,
-        }}
-      />
-
-      {/* ✅ Error Message */}
-      {error ? (
-        <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
-      ) : null}
-
-      <TouchableOpacity
-        onPress={handleReset}
-        style={{
-          backgroundColor: colors.button,
-          padding: 15,
-          borderRadius: 8,
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>Send Reset</Text>
-      </TouchableOpacity>
     </View>
   );
 }
