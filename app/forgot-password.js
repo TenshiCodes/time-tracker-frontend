@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
     Text,
@@ -11,6 +13,7 @@ import { API_BASE } from "../config";
 export default function ForgotPassword() {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
