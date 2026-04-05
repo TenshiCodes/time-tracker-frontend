@@ -17,7 +17,7 @@ export default function RootLayout() {
       >
         <TouchableOpacity onPress={() => router.push("/")}>
           <Image
-            source={require("../assets/logo_white_pbe.png")}
+            source={require("../assets/images/logo_white_pbe.png")}
             style={{ width: 45, height: 45, resizeMode: "contain" }}
           />
         </TouchableOpacity>
