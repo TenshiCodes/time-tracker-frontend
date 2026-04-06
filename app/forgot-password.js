@@ -26,7 +26,7 @@ export default function ForgotPassword() {
     text: isDark ? "#ffffff" : "#000000",
     border: isDark ? "#333" : "#ccc",
     placeholder: isDark ? "#aaa" : "#666",
-    button: "#4CAF50",
+    button: "#1F9BB7",
     error: isDark ? "#ff6b6b" : "red",
   };
 

@@ -441,7 +441,7 @@ export default function Time() {
                   onPress={() => handleAddToCalendar(entry.id)}
                   style={{
                     marginTop: 10,
-                    backgroundColor: "#2196F3",
+                    backgroundColor: "#4CAF50",
                     padding: 8,
                     borderRadius: 6,
                   }}

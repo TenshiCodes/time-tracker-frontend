@@ -10,7 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   useColorScheme,
-  View
+  View,
 } from "react-native";
 import { API_BASE } from "../config";
 
@@ -26,7 +26,7 @@ export default function Login() {
     text: isDark ? "#ffffff" : "#000000",
     border: isDark ? "#333" : "#ccc",
     placeholder: isDark ? "#aaa" : "#666",
-    button: "#4CAF50",
+    button: "#1F9BB7",
     disabled: "#888", // ✅ added
   };
 
@@ -213,7 +213,7 @@ export default function Login() {
           onPress={() => router.push("/create-user")}
           style={{ marginTop: 15 }}
         >
-          <Text style={{ color: "#4CAF50", textAlign: "center" }}>
+          <Text style={{ color: "#1F9BB7", textAlign: "center" }}>
             Create Account
           </Text>
         </TouchableOpacity>

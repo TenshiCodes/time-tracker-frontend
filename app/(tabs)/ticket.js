@@ -79,7 +79,7 @@ export default function Ticket() {
       <TouchableOpacity
         onPress={submitTicket}
         style={{
-          backgroundColor: "#4CAF50",
+          backgroundColor: "#1F9BB7",
           padding: 15,
           borderRadius: 10,
         }}
