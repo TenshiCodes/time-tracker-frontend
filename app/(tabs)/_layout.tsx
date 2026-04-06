@@ -2,10 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { Tabs, useRouter } from "expo-router";
-import { Image } from "react-native";
-
 import { useCallback, useEffect, useState } from "react";
-import { TouchableOpacity, useColorScheme, View } from "react-native";
+import { Image, TouchableOpacity, useColorScheme, View } from "react-native";
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -53,8 +51,6 @@ export default function TabsLayout() {
   );
 
   if (loading) return null;
-
-  console.log("ROLE IN TABS:", role); // ✅ correct place
 
   return (
     <Tabs

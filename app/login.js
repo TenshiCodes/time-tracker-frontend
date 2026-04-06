@@ -72,7 +72,7 @@ export default function Login() {
       );
 
       if (__DEV__) {
-        console.log("STORING USER:", data);
+        console.log("");
       }
 
       router.replace("/(tabs)");
@@ -132,7 +132,7 @@ export default function Login() {
             color: colors.text,
           }}
         >
-          Login
+          LoginTest
         </Text>
 
         <TextInput

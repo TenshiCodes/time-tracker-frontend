@@ -3,8 +3,14 @@
     "name": "testApp",
     "slug": "testApp",
     "version": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/b14513c4-7612-4b07-93de-6b8bd0cda99f"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_white_pbe.png",
     "scheme": "testapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +25,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.pacificblueengineering.timeapp"
     },
     "web": {
       "output": "static",
@@ -30,7 +37,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo_white_pbe.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -38,11 +45,19 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b14513c4-7612-4b07-93de-6b8bd0cda99f"
+      }
+    },
+    "owner": "tenshicodes"
   }
 }

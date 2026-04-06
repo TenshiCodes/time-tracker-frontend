@@ -58,19 +58,12 @@ export default function EditTime() {
 
     const d = new Date(normalized);
 
-    console.log("RAW:", str);
-    console.log("PARSED:", d.toString());
-
     return d;
   };
 
   const loadEntry = async () => {
-    console.log("🚀 Loading entry:", id);
-
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
     const data = await res.json();
-
-    console.log("📦 BACKEND:", data);
 
     setEntry(data);
     // 🔍 SEARCH JOBS
@@ -82,8 +75,6 @@ export default function EditTime() {
       setStartDateObj(local);
 
       const d = local.toLocaleDateString("en-CA");
-      console.log("📅 START DATE:", d);
-
       setDate(d);
 
       const h = local.getHours().toString().padStart(2, "0");
@@ -99,8 +90,6 @@ export default function EditTime() {
       setEndDateObj(local);
 
       const d = local.toLocaleDateString("en-CA");
-      console.log("📅 END DATE:", d);
-
       setEndDate(d);
 
       const h = local.getHours().toString().padStart(2, "0");
@@ -119,9 +108,6 @@ export default function EditTime() {
 
     const local = new Date(y, mo - 1, d, h, m);
 
-    console.log("💾 LOCAL:", local.toString());
-    console.log("💾 UTC:", local.toISOString());
-
     return local.toISOString();
   };
 
@@ -132,9 +118,6 @@ export default function EditTime() {
       clock_in: formatForSQL(date, startTime),
       clock_out: formatForSQL(endDate || date, endTime),
     };
-
-    console.log("💾 FINAL:", updated);
-
     await fetch(`${API_BASE}/time/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -187,15 +170,11 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowDate(false);
                 if (selected && startDateObj) {
-                  console.log("📅 PICK START DATE:", selected.toString());
-
                   // 🔥 MERGE date into existing Date
                   const updated = new Date(startDateObj);
                   updated.setFullYear(selected.getFullYear());
                   updated.setMonth(selected.getMonth());
                   updated.setDate(selected.getDate());
-
-                  console.log("✅ MERGED START DATE:", updated.toString());
 
                   setStartDateObj(updated);
 
@@ -211,8 +190,6 @@ export default function EditTime() {
           placeholder="YYYY-MM-DD"
           value={date}
           onChangeText={(text) => {
-            console.log("⌨️ WEB START DATE:", text);
-
             setDate(text);
 
             if (!startDateObj || !text.includes("-")) return;
@@ -223,8 +200,6 @@ export default function EditTime() {
             updated.setFullYear(Number(y));
             updated.setMonth(Number(m) - 1);
             updated.setDate(Number(d));
-
-            console.log("🧠 UPDATED startDateObj DATE:", updated.toString());
 
             setStartDateObj(updated);
           }}
@@ -261,14 +236,10 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowStart(false);
                 if (selected && startDateObj) {
-                  console.log("🕐 PICK START:", selected.toString());
-
                   // 🔥 MERGE time into existing date
                   const updated = new Date(startDateObj);
                   updated.setHours(selected.getHours());
                   updated.setMinutes(selected.getMinutes());
-
-                  console.log("✅ MERGED START:", updated.toString());
 
                   setStartDateObj(updated);
 
@@ -286,8 +257,6 @@ export default function EditTime() {
           placeholder="Start (HH:MM)"
           value={startTime}
           onChangeText={(text) => {
-            console.log("⌨️ WEB START:", text);
-
             setStartTime(text);
 
             if (!text.includes(":") || !startDateObj) return;
@@ -297,8 +266,6 @@ export default function EditTime() {
             const updated = new Date(startDateObj);
             updated.setHours(Number(h));
             updated.setMinutes(Number(m));
-
-            console.log("🧠 UPDATED startDateObj:", updated.toString());
 
             setStartDateObj(updated);
           }}
@@ -335,14 +302,10 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEndDate(false);
                 if (selected && endDateObj) {
-                  console.log("📅 PICK END DATE:", selected.toString());
-
                   const updated = new Date(endDateObj);
                   updated.setFullYear(selected.getFullYear());
                   updated.setMonth(selected.getMonth());
                   updated.setDate(selected.getDate());
-
-                  console.log("✅ MERGED END DATE:", updated.toString());
 
                   setEndDateObj(updated);
 
@@ -358,8 +321,6 @@ export default function EditTime() {
           placeholder="YYYY-MM-DD"
           value={endDate}
           onChangeText={(text) => {
-            console.log("⌨️ WEB END DATE:", text);
-
             setEndDate(text);
 
             if (!endDateObj || !text.includes("-")) return;
@@ -370,8 +331,6 @@ export default function EditTime() {
             updated.setFullYear(Number(y));
             updated.setMonth(Number(m) - 1);
             updated.setDate(Number(d));
-
-            console.log("🧠 UPDATED endDateObj DATE:", updated.toString());
 
             setEndDateObj(updated);
           }}
@@ -408,14 +367,10 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEnd(false);
                 if (selected && endDateObj) {
-                  console.log("🕐 PICK END:", selected.toString());
-
                   // 🔥 MERGE time into existing date
                   const updated = new Date(endDateObj);
                   updated.setHours(selected.getHours());
                   updated.setMinutes(selected.getMinutes());
-
-                  console.log("✅ MERGED END:", updated.toString());
 
                   setEndDateObj(updated);
 
@@ -433,8 +388,6 @@ export default function EditTime() {
           placeholder="End (HH:MM)"
           value={endTime}
           onChangeText={(text) => {
-            console.log("⌨️ WEB END:", text);
-
             setEndTime(text);
 
             if (!text.includes(":") || !endDateObj) return;
@@ -444,8 +397,6 @@ export default function EditTime() {
             const updated = new Date(endDateObj);
             updated.setHours(Number(h));
             updated.setMinutes(Number(m));
-
-            console.log("🧠 UPDATED endDateObj:", updated.toString());
 
             setEndDateObj(updated);
           }}
@@ -480,8 +431,6 @@ export default function EditTime() {
             <TouchableOpacity
               key={item.id ?? index}
               onPress={() => {
-                console.log("🟢 SELECTED ITEM:", item);
-
                 setEntry({
                   ...(entry || {}),
                   job_code: item.code || "",

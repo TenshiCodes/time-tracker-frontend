@@ -76,8 +76,6 @@ export default function Users() {
 
   // 🔥 DELETE USER
   const handleDelete = async (id) => {
-    console.log("Deleting user:", id);
-
     try {
       const res = await fetch(`${API_BASE}/users/${id}`, {
         method: "DELETE",
@@ -91,7 +89,6 @@ export default function Users() {
           data = { detail: "Unknown error" };
         }
 
-        console.log("ERROR:", data);
         Alert.alert("Error", data.detail || "Failed to delete user");
         return;
       }

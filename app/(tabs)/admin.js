@@ -31,11 +31,7 @@ export default function Admin() {
     try {
       const res = await fetch(`${API_BASE}/tickets`);
 
-      console.log("STATUS:", res.status);
-
       const data = await res.json();
-      console.log("DATA:", data);
-
       setTickets(
         Array.isArray(data) ? data.filter((t) => t.status === "pending") : [],
       );

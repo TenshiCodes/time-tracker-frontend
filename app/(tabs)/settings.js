@@ -1,4 +1,3 @@
-console.log("🔥 SETTINGS SCREEN LOADED");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
@@ -30,8 +29,6 @@ const exportData = async () => {
 
     const url = `${API_BASE}/export/time?user_id=${userId}&tz=${encodeURIComponent(tz)}`;
 
-    console.log("📤 EXPORT URL:", url);
-
     // 🌐 WEB
     if (Platform.OS === "web") {
       window.open(url, "_blank");
@@ -42,8 +39,6 @@ const exportData = async () => {
     const fileUri = FileSystem.documentDirectory + "time_entries.xlsx";
 
     const download = await FileSystem.downloadAsync(url, fileUri);
-
-    console.log("📥 DOWNLOAD RESULT:", download);
 
     const isAvailable = await Sharing.isAvailableAsync();
     if (!isAvailable) {
@@ -83,7 +78,7 @@ export default function Settings() {
           const users = await res.json();
 
           const currentUser = users.find((u) => u.id === parsed.id);
-          console.log("👤 LOADED USER:", parsed);
+
           if (currentUser) {
             setEmailNotif(!!currentUser.email_notifications);
             setPhoneNotif(!!currentUser.sms_notifications);
@@ -102,7 +97,6 @@ export default function Settings() {
       const storedUser = await AsyncStorage.getItem("user");
 
       if (!storedUser) {
-        console.log("❌ No user found in storage");
         return;
       }
 
@@ -110,12 +104,8 @@ export default function Settings() {
       const id = parsed.id;
 
       if (!id) {
-        console.log("❌ Missing user ID:", parsed);
         return;
       }
-
-      console.log("✅ USER ID:", id);
-      console.log("Saving:", emailValue, phoneValue);
 
       await fetch(`${API_BASE}/users/${id}/settings`, {
         method: "PUT",
@@ -136,8 +126,6 @@ export default function Settings() {
       const storedUser = await AsyncStorage.getItem("user");
       const user = JSON.parse(storedUser);
 
-      console.log("📧 USER:", user);
-
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       const res = await fetch(
@@ -146,9 +134,6 @@ export default function Settings() {
       );
 
       const text = await res.text(); // 👈 important
-
-      console.log("📧 RESPONSE STATUS:", res.status);
-      console.log("📧 RESPONSE BODY:", text);
 
       if (!res.ok) {
         alert("Server error sending email");
@@ -200,7 +185,6 @@ export default function Settings() {
         <Switch
           value={emailNotif}
           onValueChange={(value) => {
-            console.log("📧 EMAIL TOGGLED:", value); // ✅ HERE
             setEmailNotif(value);
             saveSettings(value, phoneNotif); // make sure this exists
           }}
@@ -228,7 +212,6 @@ export default function Settings() {
         <Switch
           value={phoneNotif}
           onValueChange={(value) => {
-            console.log("📱 SMS TOGGLED:", value); 
             setPhoneNotif(value);
             saveSettings(emailNotif, value);
           }} 
