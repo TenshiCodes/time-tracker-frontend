@@ -141,7 +141,7 @@ export default function CreateUser() {
               fontSize: 28,
               color: isDark ? "#fff" : "#000",
               marginBottom: 25,
-              textAlign: "center",
+              textAlign: "left",
             }}
           >
             Create User
