@@ -61,7 +61,7 @@ export default function ForgotPassword() {
         backgroundColor: colors.background,
       }}
     >
-      {/* 🔥 HEADER (ALWAYS TOP) */}
+      {/* 🔥 HEADER (LOGO) */}
       <View
         style={{
           height: 80,
@@ -83,38 +83,47 @@ export default function ForgotPassword() {
         </TouchableOpacity>
       </View>
 
-      {/* 🔥 CONTENT (CENTERED ONLY THIS PART) */}
+      {/* 🔙 FLOATING BACK BUTTON */}
+      <TouchableOpacity
+        onPress={() => router.replace("/login")}
+        style={{
+          position: "absolute",
+          top: 50,
+          right: 20,
+          zIndex: 10,
+          backgroundColor: isDark ? "#1e1e1e" : "#fff",
+          borderRadius: 20,
+          padding: 4,
+        }}
+      >
+        <Ionicons
+          name="arrow-back-circle"
+          size={34}
+          color={isDark ? "#fff" : "#000"}
+        />
+      </TouchableOpacity>
+
+      {/* 🔥 CONTENT */}
       <View
         style={{
           flex: 1,
-          justifyContent: "center", // 👈 ONLY here
+          justifyContent: "center",
           paddingHorizontal: 20,
-          maxWidth: 500,
           width: "100%",
+          maxWidth: 650, // 👈 perfect balance for web + mobile
           alignSelf: "center",
         }}
       >
-        {/* HEADER ROW */}
-        <View
+        <Text
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
+            fontSize: 28,
+            color: colors.text,
             marginBottom: 25,
+            textAlign: "center",
           }}
         >
-          <Text style={{ fontSize: 28, color: colors.text }}>
-            Forgot Password
-          </Text>
-
-          <TouchableOpacity onPress={() => router.replace("/login")}>
-            <Ionicons
-              name="arrow-back-circle"
-              size={32}
-              color={isDark ? "#fff" : "#000"}
-            />
-          </TouchableOpacity>
-        </View>
+          Forgot Password
+        </Text>
 
         <TextInput
           placeholder="Username or Email"
@@ -132,6 +141,7 @@ export default function ForgotPassword() {
             borderRadius: 10,
             color: colors.text,
             backgroundColor: colors.card,
+            width: "100%",
           }}
         />
 
@@ -144,8 +154,9 @@ export default function ForgotPassword() {
           style={{
             backgroundColor: colors.button,
             padding: 16,
-            borderRadius: 10,
+            borderRadius: 12,
             marginTop: 10,
+            width: "100%",
           }}
         >
           <Text style={{ color: "#fff", textAlign: "center" }}>Send Reset</Text>
