@@ -113,6 +113,11 @@ export default function Time() {
 
           setClockedIn(true);
           setClockInTime(time);
+          // ✅ ADD THIS
+          setActiveJob({
+            code: data.job_code,
+            name: data.job_name,
+          });
 
           // ✅ FIX HERE TOO
           const diff = Math.floor((Date.now() - time.getTime()) / 1000);
