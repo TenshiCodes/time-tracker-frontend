@@ -1,14 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
   Linking,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useColorScheme,
   View,
 } from "react-native";
@@ -16,7 +19,6 @@ import { API_BASE } from "../config";
 
 export default function Login() {
   const router = useRouter();
-
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -27,13 +29,26 @@ export default function Login() {
     border: isDark ? "#333" : "#ccc",
     placeholder: isDark ? "#aaa" : "#666",
     button: "#4CAF50",
+    disabled: "#888",
   };
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordRef = useRef(null);
 
   const handleLogin = async () => {
+    if (!username || !password) {
+      setError("Please enter username and password");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
     try {
       const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
@@ -47,154 +62,196 @@ export default function Login() {
 
       if (!res.ok) {
         const message = data.detail || "Login failed";
-
-        setError(message); // ✅ shows on web + mobile UI
-        Alert.alert("Login Failed", message); // ✅ still pops on mobile
-
+        setError(message);
+        Alert.alert("Login Failed", message);
         return;
       }
 
-      // ✅ SAVE USER SESSION
       await AsyncStorage.setItem(
         "user",
         JSON.stringify({
           username: data.username,
           role: data.role,
-          id: data.id, // ✅ MUST MATCH BACKEND
+          id: data.id,
         }),
       );
-      console.log("STORING USER:", data);
+
       router.replace("/(tabs)");
     } catch (err) {
       Alert.alert("Error", "Network error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-    >
-      {/* 🔥 HEADER (LOGO) */}
-      <View
-        style={{
-          height: 80,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: colors.background, // 👈 blends perfectly
-        }}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1, backgroundColor: colors.background }}
       >
-        <TouchableOpacity
-          onPress={async () => {
-            const url = "https://pacificblueengineering.com";
-            const supported = await Linking.canOpenURL(url);
-            if (supported) {
-              await Linking.openURL(url);
-            } else {
-              console.log("Can't open URL:", url);
-            }
-          }}
-        >
-          <Image
-            source={require("../assets/images/logo_white_pbe.png")}
-            style={{ width: 50, height: 50, resizeMode: "contain" }}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* 🔥 CONTENT */}
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          padding: 20,
-        }}
-      >
-        <Text
+        {/* HEADER */}
+        <View
           style={{
-            fontSize: 28,
-            marginBottom: 20,
-            color: colors.text,
+            height: 90,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          Login
-        </Text>
+          <TouchableOpacity
+            onPress={async () => {
+              const url = "https://pacificblueengineering.com";
+              if (await Linking.canOpenURL(url)) {
+                await Linking.openURL(url);
+              }
+            }}
+          >
+            <Image
+              source={require("../assets/images/logo_white_pbe.png")}
+              style={{ width: 55, height: 55, resizeMode: "contain" }}
+            />
+          </TouchableOpacity>
+        </View>
 
-        <TextInput
-          placeholder="Username"
-          placeholderTextColor={colors.placeholder}
-          value={username}
-          onChangeText={(text) => {
-            setUsername(text);
-            setError("");
-          }}
+        {/* CARD */}
+        <View
           style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 8,
-            color: colors.text,
-            backgroundColor: colors.card,
-          }}
-        />
-
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor={colors.placeholder}
-          secureTextEntry
-          value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-            setError("");
-          }}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 8,
-            color: colors.text,
-            backgroundColor: colors.card,
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() => router.push("/forgot-password")}
-          style={{ alignSelf: "flex-end", marginBottom: 10 }}
-        >
-          <Text style={{ color: colors.button }}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        {error ? (
-          <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
-            {error}
-          </Text>
-        ) : null}
-
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={{
-            backgroundColor: colors.button,
-            padding: 15,
-            borderRadius: 8,
-            marginTop: 10,
+            flex: 1,
+            justifyContent: "center",
+            padding: 20,
           }}
         >
-          <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
-        </TouchableOpacity>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: 20,
+              borderRadius: 15,
+              shadowColor: "#000",
+              shadowOpacity: 0.1,
+              shadowRadius: 10,
+              elevation: 5,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 26,
+                marginBottom: 20,
+                textAlign: "center",
+                color: colors.text,
+                fontWeight: "600",
+              }}
+            >
+              Welcome Back
+            </Text>
 
-        <TouchableOpacity
-          onPress={() => router.push("/create-user")}
-          style={{ marginTop: 15 }}
-        >
-          <Text style={{ color: "#4CAF50", textAlign: "center" }}>
-            Create Account
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            {/* USERNAME */}
+            <TextInput
+              placeholder="Username"
+              placeholderTextColor={colors.placeholder}
+              value={username}
+              autoCapitalize="none"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              onChangeText={(text) => {
+                setUsername(text);
+                setError("");
+              }}
+              style={{
+                borderWidth: 1,
+                borderColor: colors.border,
+                padding: 12,
+                marginBottom: 12,
+                borderRadius: 10,
+                color: colors.text,
+                backgroundColor: colors.background,
+              }}
+            />
+
+            {/* PASSWORD */}
+            <View style={{ position: "relative" }}>
+              <TextInput
+                ref={passwordRef}
+                placeholder="Password"
+                placeholderTextColor={colors.placeholder}
+                secureTextEntry={!showPassword}
+                returnKeyType="done"
+                onSubmitEditing={handleLogin}
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setError("");
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  padding: 12,
+                  borderRadius: 10,
+                  color: colors.text,
+                  backgroundColor: colors.background,
+                }}
+              />
+
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: 12,
+                }}
+              >
+                <Text>{showPassword ? "🙈" : "👁️"}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* FORGOT */}
+            <TouchableOpacity
+              onPress={() => router.push("/forgot-password")}
+              style={{ alignSelf: "flex-end", marginTop: 10 }}
+            >
+              <Text style={{ color: colors.button }}>Forgot Password?</Text>
+            </TouchableOpacity>
+
+            {/* ERROR */}
+            {error ? (
+              <Text
+                style={{
+                  color: "#ff6b6b",
+                  marginTop: 10,
+                  textAlign: "center",
+                }}
+              >
+                {error}
+              </Text>
+            ) : null}
+
+            {/* LOGIN BUTTON */}
+            <TouchableOpacity
+              onPress={handleLogin}
+              disabled={loading}
+              style={{
+                backgroundColor: loading ? colors.disabled : colors.button,
+                padding: 15,
+                borderRadius: 10,
+                marginTop: 20,
+              }}
+            >
+              <Text style={{ color: "#fff", textAlign: "center" }}>
+                {loading ? "Logging in..." : "Login"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* CREATE ACCOUNT */}
+            <TouchableOpacity
+              onPress={() => router.push("/create-user")}
+              style={{ marginTop: 15 }}
+            >
+              <Text style={{ color: colors.button, textAlign: "center" }}>
+                Create Account
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
