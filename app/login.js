@@ -132,7 +132,7 @@ export default function Login() {
             color: colors.text,
           }}
         >
-          LoginTest
+          Login
         </Text>
 
         <TextInput
