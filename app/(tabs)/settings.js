@@ -237,7 +237,7 @@ export default function Settings() {
       <TouchableOpacity
         onPress={exportData}
         style={{
-          backgroundColor: "#4CAF50",
+          backgroundColor: "#34A853",
           padding: 15,
           borderRadius: 10,
           marginTop: 20,
@@ -250,7 +250,7 @@ export default function Settings() {
       <TouchableOpacity
         onPress={emailExport}
         style={{
-          backgroundColor: "#F97316",
+          backgroundColor: "#319db6",
           padding: 15,
           borderRadius: 10,
           marginTop: 10,
