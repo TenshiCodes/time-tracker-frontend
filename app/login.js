@@ -1,24 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
-  Keyboard,
-  KeyboardAvoidingView,
   Linking,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   useColorScheme,
-  View,
+  View
 } from "react-native";
 import { API_BASE } from "../config";
 
 export default function Login() {
   const router = useRouter();
+
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -29,16 +27,13 @@ export default function Login() {
     border: isDark ? "#333" : "#ccc",
     placeholder: isDark ? "#aaa" : "#666",
     button: "#4CAF50",
-    disabled: "#888",
+    disabled: "#888", // ✅ added
   };
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const passwordRef = useRef(null);
+  const [loading, setLoading] = useState(false); // ✅ added
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -46,8 +41,7 @@ export default function Login() {
       return;
     }
 
-    setLoading(true);
-    setError("");
+    setLoading(true); // ✅ added
 
     try {
       const res = await fetch(`${API_BASE}/login`, {
@@ -62,6 +56,7 @@ export default function Login() {
 
       if (!res.ok) {
         const message = data.detail || "Login failed";
+
         setError(message);
         Alert.alert("Login Failed", message);
         return;
@@ -76,182 +71,153 @@ export default function Login() {
         }),
       );
 
+      if (__DEV__) {
+        console.log("STORING USER:", data);
+      }
+
       router.replace("/(tabs)");
     } catch (err) {
       Alert.alert("Error", "Network error");
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ added
     }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, backgroundColor: colors.background }}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      {/* HEADER */}
+      <View
+        style={{
+          height: 80,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.background,
+        }}
       >
-        {/* HEADER */}
-        <View
-          style={{
-            height: 90,
-            justifyContent: "center",
-            alignItems: "center",
+        <TouchableOpacity
+          onPress={async () => {
+            const url = "https://pacificblueengineering.com";
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+              await Linking.openURL(url);
+            } else {
+              console.log("Can't open URL:", url);
+            }
           }}
         >
-          <TouchableOpacity
-            onPress={async () => {
-              const url = "https://pacificblueengineering.com";
-              if (await Linking.canOpenURL(url)) {
-                await Linking.openURL(url);
-              }
-            }}
-          >
-            <Image
-              source={require("../assets/images/logo_white_pbe.png")}
-              style={{ width: 55, height: 55, resizeMode: "contain" }}
-            />
-          </TouchableOpacity>
-        </View>
+          <Image
+            source={require("../assets/images/logo_white_pbe.png")}
+            style={{ width: 50, height: 50, resizeMode: "contain" }}
+          />
+        </TouchableOpacity>
+      </View>
 
-        {/* CARD */}
-        <View
+      {/* CONTENT */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          padding: 20,
+        }}
+      >
+        <Text
           style={{
-            flex: 1,
-            justifyContent: "center",
-            padding: 20,
+            fontSize: 28,
+            marginBottom: 20,
+            color: colors.text,
           }}
         >
-          <View
-            style={{
-              backgroundColor: colors.card,
-              padding: 20,
-              borderRadius: 15,
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 10,
-              elevation: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 26,
-                marginBottom: 20,
-                textAlign: "center",
-                color: colors.text,
-                fontWeight: "600",
-              }}
-            >
-              Welcome Back
-            </Text>
+          Login
+        </Text>
 
-            {/* USERNAME */}
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor={colors.placeholder}
-              value={username}
-              autoCapitalize="none"
-              returnKeyType="next"
-              onSubmitEditing={() => passwordRef.current?.focus()}
-              onChangeText={(text) => {
-                setUsername(text);
-                setError("");
-              }}
-              style={{
-                borderWidth: 1,
-                borderColor: colors.border,
-                padding: 12,
-                marginBottom: 12,
-                borderRadius: 10,
-                color: colors.text,
-                backgroundColor: colors.background,
-              }}
-            />
+        <TextInput
+          placeholder="Username"
+          placeholderTextColor={colors.placeholder}
+          value={username}
+          autoCapitalize="none" // ✅ mobile improvement
+          returnKeyType="next" // ✅ mobile improvement
+          onChangeText={(text) => {
+            setUsername(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
 
-            {/* PASSWORD */}
-            <View style={{ position: "relative" }}>
-              <TextInput
-                ref={passwordRef}
-                placeholder="Password"
-                placeholderTextColor={colors.placeholder}
-                secureTextEntry={!showPassword}
-                returnKeyType="done"
-                onSubmitEditing={handleLogin}
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setError("");
-                }}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  padding: 12,
-                  borderRadius: 10,
-                  color: colors.text,
-                  backgroundColor: colors.background,
-                }}
-              />
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={colors.placeholder}
+          secureTextEntry
+          value={password}
+          returnKeyType="done" // ✅ mobile improvement
+          onSubmitEditing={handleLogin} // ✅ mobile UX
+          onChangeText={(text) => {
+            setPassword(text);
+            setError("");
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            color: colors.text,
+            backgroundColor: colors.card,
+          }}
+        />
 
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: 10,
-                  top: 12,
-                }}
-              >
-                <Text>{showPassword ? "🙈" : "👁️"}</Text>
-              </TouchableOpacity>
-            </View>
+        <TouchableOpacity
+          onPress={() => router.push("/forgot-password")}
+          style={{ alignSelf: "flex-end", marginBottom: 10 }}
+        >
+          <Text style={{ color: colors.button }}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-            {/* FORGOT */}
-            <TouchableOpacity
-              onPress={() => router.push("/forgot-password")}
-              style={{ alignSelf: "flex-end", marginTop: 10 }}
-            >
-              <Text style={{ color: colors.button }}>Forgot Password?</Text>
-            </TouchableOpacity>
+        {error ? (
+          <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
+            {error}
+          </Text>
+        ) : null}
 
-            {/* ERROR */}
-            {error ? (
-              <Text
-                style={{
-                  color: "#ff6b6b",
-                  marginTop: 10,
-                  textAlign: "center",
-                }}
-              >
-                {error}
-              </Text>
-            ) : null}
+        {/* 🔥 LOGIN BUTTON */}
+        <TouchableOpacity
+          onPress={handleLogin}
+          disabled={loading}
+          activeOpacity={0.7} // ✅ better press feedback
+          style={{
+            backgroundColor: loading ? colors.disabled : colors.button,
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 10,
+            opacity: loading ? 0.7 : 1, // ✅ visual feedback
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            {loading ? "Logging in..." : "Login"}
+          </Text>
+        </TouchableOpacity>
 
-            {/* LOGIN BUTTON */}
-            <TouchableOpacity
-              onPress={handleLogin}
-              disabled={loading}
-              style={{
-                backgroundColor: loading ? colors.disabled : colors.button,
-                padding: 15,
-                borderRadius: 10,
-                marginTop: 20,
-              }}
-            >
-              <Text style={{ color: "#fff", textAlign: "center" }}>
-                {loading ? "Logging in..." : "Login"}
-              </Text>
-            </TouchableOpacity>
-
-            {/* CREATE ACCOUNT */}
-            <TouchableOpacity
-              onPress={() => router.push("/create-user")}
-              style={{ marginTop: 15 }}
-            >
-              <Text style={{ color: colors.button, textAlign: "center" }}>
-                Create Account
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        <TouchableOpacity
+          onPress={() => router.push("/create-user")}
+          style={{ marginTop: 15 }}
+        >
+          <Text style={{ color: "#4CAF50", textAlign: "center" }}>
+            Create Account
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
