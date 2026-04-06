@@ -16,15 +16,29 @@ import { API_BASE } from "../../config"; // ✅ ADD THIS
 const exportData = async () => {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const url = `${API_BASE}/export/time?tz=${encodeURIComponent(tz)}`;
+
+    // ✅ GET USER OBJECT
+    const userStr = await AsyncStorage.getItem("user");
+
+    if (!userStr) {
+      alert("User not logged in");
+      return;
+    }
+
+    const user = JSON.parse(userStr);
+    const userId = user.id;
+
+    const url = `${API_BASE}/export/time?user_id=${userId}&tz=${encodeURIComponent(tz)}`;
 
     console.log("📤 EXPORT URL:", url);
 
+    // 🌐 WEB
     if (Platform.OS === "web") {
       window.open(url, "_blank");
       return;
     }
 
+    // 📱 MOBILE
     const fileUri = FileSystem.documentDirectory + "time_entries.xlsx";
 
     const download = await FileSystem.downloadAsync(url, fileUri);
@@ -42,6 +56,7 @@ const exportData = async () => {
     console.error("❌ Export failed:", err);
   }
 };
+
 export default function Settings() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
