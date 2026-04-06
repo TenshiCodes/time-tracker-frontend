@@ -3,6 +3,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
+  Linking,
   Platform,
   Text,
   TextInput,
@@ -80,99 +82,131 @@ export default function CreateUser() {
         backgroundColor: isDark ? "#121212" : "#f2f2f2",
       }}
     >
-      <View
-        style={{
-          flex: 1,
-          padding: 20,
-          paddingTop: 10, // small extra spacing under status bar
-        }}
-      >
-        {/* HEADER */}
+      <View style={{ flex: 1 }}>
+        {/* 🔥 HEADER (LOGO) */}
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
+            height: 80,
+            justifyContent: "center",
             alignItems: "center",
-            marginBottom: 20,
+          }}
+        >
+          <TouchableOpacity
+            onPress={async () => {
+              const url = "https://pacificblueengineering.com";
+              const supported = await Linking.canOpenURL(url);
+              if (supported) await Linking.openURL(url);
+            }}
+          >
+            <Image
+              source={require("../assets/images/logo_white_pbe.png")}
+              style={{ width: 50, height: 50, resizeMode: "contain" }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* 🔙 FLOATING BACK BUTTON */}
+        <TouchableOpacity
+          onPress={() => router.replace("/login")}
+          style={{
+            position: "absolute",
+            top: 50,
+            right: 20,
+            zIndex: 10,
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            borderRadius: 20,
+            padding: 4,
+          }}
+        >
+          <Ionicons
+            name="arrow-back-circle"
+            size={34}
+            color={isDark ? "#fff" : "#000"}
+          />
+        </TouchableOpacity>
+
+        {/* 🔥 CONTENT */}
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            paddingHorizontal: 20,
+            width: "100%",
+            maxWidth: 650,
+            alignSelf: "center",
           }}
         >
           <Text
             style={{
-              fontSize: 24,
+              fontSize: 28,
               color: isDark ? "#fff" : "#000",
+              marginBottom: 25,
+              textAlign: "center",
             }}
           >
             Create User
           </Text>
 
-          {/* BACK BUTTON (TOP RIGHT) */}
-          <TouchableOpacity onPress={() => router.replace("/login")}>
-            <Ionicons
-              name="arrow-back-circle"
-              size={32}
-              color={isDark ? "#fff" : "#000"}
-            />
+          {/* INPUTS */}
+          <TextInput
+            placeholder="First Name"
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            value={firstName}
+            onChangeText={setFirstName}
+            style={{ ...inputStyle, width: "100%" }}
+          />
+
+          <TextInput
+            placeholder="Last Name"
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            value={lastName}
+            onChangeText={setLastName}
+            style={{ ...inputStyle, width: "100%" }}
+          />
+
+          <TextInput
+            placeholder="Work Email"
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            value={email}
+            onChangeText={setEmail}
+            style={{ ...inputStyle, width: "100%" }}
+            keyboardType="email-address"
+          />
+
+          <TextInput
+            placeholder="Work Phone"
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            value={phone}
+            onChangeText={setPhone}
+            style={{ ...inputStyle, width: "100%" }}
+            keyboardType="phone-pad"
+          />
+
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={{ ...inputStyle, width: "100%" }}
+          />
+
+          {/* BUTTON */}
+          <TouchableOpacity
+            onPress={handleCreateUser}
+            style={{
+              backgroundColor: "#4CAF50",
+              padding: 16,
+              borderRadius: 12,
+              marginTop: 10,
+              width: "100%",
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center", fontSize: 16 }}>
+              Create User
+            </Text>
           </TouchableOpacity>
         </View>
-
-        {/* INPUTS */}
-        <TextInput
-          placeholder="First Name"
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          value={firstName}
-          onChangeText={setFirstName}
-          style={inputStyle}
-        />
-
-        <TextInput
-          placeholder="Last Name"
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          value={lastName}
-          onChangeText={setLastName}
-          style={inputStyle}
-        />
-
-        <TextInput
-          placeholder="Work Email"
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          value={email}
-          onChangeText={setEmail}
-          style={inputStyle}
-          keyboardType="email-address"
-        />
-
-        <TextInput
-          placeholder="Work Phone"
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          value={phone}
-          onChangeText={setPhone}
-          style={inputStyle}
-          keyboardType="phone-pad"
-        />
-
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={inputStyle}
-        />
-
-        {/* BUTTON */}
-        <TouchableOpacity
-          onPress={handleCreateUser}
-          style={{
-            backgroundColor: "#4CAF50",
-            padding: 15,
-            borderRadius: 12,
-            marginTop: 10,
-          }}
-        >
-          <Text style={{ color: "#fff", textAlign: "center", fontSize: 16 }}>
-            Create User
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

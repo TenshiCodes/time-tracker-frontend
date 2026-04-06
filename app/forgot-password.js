@@ -119,7 +119,7 @@ export default function ForgotPassword() {
             fontSize: 28,
             color: colors.text,
             marginBottom: 25,
-            textAlign: "center",
+            textAlign: "left",
           }}
         >
           Forgot Password
