@@ -3,24 +3,23 @@ import * as Updates from "expo-updates";
 import { useEffect } from "react";
 import { View, useColorScheme } from "react-native";
 
-useEffect(() => {
-  const checkForUpdates = async () => {
-    try {
-      const update = await Updates.checkForUpdateAsync();
-
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync();
-      }
-    } catch (e) {
-      console.log("Update check failed:", e);
-    }
-  };
-
-  checkForUpdates();
-}, []);
-
 export default function RootLayout() {
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (e) {
+        console.log("Update check failed:", e);
+      }
+    };
+
+    checkForUpdates();
+  }, []);
   const router = useRouter();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
