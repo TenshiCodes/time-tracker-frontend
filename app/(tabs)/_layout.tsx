@@ -133,7 +133,7 @@ export default function TabsLayout() {
           if (route.name === "admin-dashboard") {
             iconName = focused ? "document" : "document-outline";
           } else if (route.name === "index") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = focused ? "search" : "search-outline";
           } else if (route.name === "ticket") {
             iconName = focused ? "ticket" : "ticket-outline";
           } else if (route.name === "history") {
@@ -210,8 +210,18 @@ export default function TabsLayout() {
         name="edit-time"
         options={{ href: role ? undefined : null, href: null }}
       />
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
+      <Tabs.Screen
+        name="index"
+        options={{ title: "Home", href: role === "user" ? undefined : null }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{ title: "Search", href: role === "admin" ? undefined : null }}
+      />
+      <Tabs.Screen
+        name="ticket"
+        options={{ title: "Ticket", href: role === "user" ? undefined : null }}
+      />
       <Tabs.Screen
         name="time"
         options={{ title: "Time", href: role === "user" ? undefined : null }}
