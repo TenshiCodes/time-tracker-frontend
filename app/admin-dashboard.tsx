@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { API_BASE } from "../config.js";
 
-// ✅ TYPES (fixes TS issues)
+// ✅ TYPES
 type User = {
   id: number;
   first_name: string;
@@ -19,8 +19,9 @@ type User = {
 };
 
 type Job = {
-  job_code: string;
-  job_name: string;
+  id: number;
+  code: string;
+  name: string;
 };
 
 export default function AdminDashboard() {
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
     card: isDark ? "#1e1e1e" : "#fff",
     text: isDark ? "#fff" : "#000",
     border: isDark ? "#333" : "#ccc",
+    inputBg: isDark ? "#1e1e1e" : "#fff",
     button: "#4CAF50",
   };
 
@@ -127,6 +129,17 @@ export default function AdminDashboard() {
     }
   };
 
+  // 🎨 COMMON INPUT STYLE
+  const inputStyle = {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
+    padding: 12,
+    marginBottom: 10,
+    borderRadius: 8,
+    color: colors.text,
+  };
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -153,12 +166,13 @@ export default function AdminDashboard() {
             borderColor: colors.border,
             borderRadius: 8,
             marginBottom: 10,
+            backgroundColor: colors.inputBg,
           }}
         >
           <Picker
             selectedValue={filters.user_id}
-            onValueChange={
-              (value) => setFilters({ ...filters, user_id: String(value) }) // ✅ FIX
+            onValueChange={(value) =>
+              setFilters({ ...filters, user_id: String(value) })
             }
             dropdownIconColor={colors.text}
             style={{ color: colors.text }}
@@ -182,12 +196,13 @@ export default function AdminDashboard() {
             borderColor: colors.border,
             borderRadius: 8,
             marginBottom: 10,
+            backgroundColor: colors.inputBg,
           }}
         >
           <Picker
             selectedValue={filters.job_code}
-            onValueChange={
-              (value) => setFilters({ ...filters, job_code: String(value) }) // ✅ FIX
+            onValueChange={(value) =>
+              setFilters({ ...filters, job_code: String(value) })
             }
             dropdownIconColor={colors.text}
             style={{ color: colors.text }}
@@ -195,9 +210,9 @@ export default function AdminDashboard() {
             <Picker.Item label="All Jobs" value="" />
             {jobs.map((job) => (
               <Picker.Item
-                key={job.job_code}
-                label={`${job.job_code} - ${job.job_name}`}
-                value={job.job_code}
+                key={job.id}
+                label={`${job.code} - ${job.name}`}
+                value={job.code}
               />
             ))}
           </Picker>
@@ -206,32 +221,18 @@ export default function AdminDashboard() {
         {/* 📅 DATES */}
         <TextInput
           placeholder="Start Date (YYYY-MM-DD)"
-          placeholderTextColor="#888"
+          placeholderTextColor={isDark ? "#888" : "#666"}
           value={filters.start_date}
           onChangeText={(t) => setFilters({ ...filters, start_date: t })}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 10,
-            marginBottom: 10,
-            borderRadius: 8,
-            color: colors.text,
-          }}
+          style={inputStyle}
         />
 
         <TextInput
           placeholder="End Date (YYYY-MM-DD)"
-          placeholderTextColor="#888"
+          placeholderTextColor={isDark ? "#888" : "#666"}
           value={filters.end_date}
           onChangeText={(t) => setFilters({ ...filters, end_date: t })}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 10,
-            marginBottom: 10,
-            borderRadius: 8,
-            color: colors.text,
-          }}
+          style={inputStyle}
         />
 
         {/* BUTTONS */}
@@ -280,9 +281,13 @@ export default function AdminDashboard() {
           <Text style={{ color: colors.text }}>
             {new Date(row.clock_in).toLocaleDateString()}
           </Text>
+
           <Text style={{ color: colors.text }}>{formatTime(row)}</Text>
-          <Text style={{ color: "#4CAF50" }}>{row.job_code}</Text>
-          <Text style={{ color: "#888" }}>{row.customer || "-"}</Text>
+
+          {/* ✅ FIXED */}
+          <Text style={{ color: "#4CAF50" }}>
+            {row.job_name ? `${row.job_code} - ${row.job_name}` : row.job_code}
+          </Text>
         </View>
       ))}
     </ScrollView>

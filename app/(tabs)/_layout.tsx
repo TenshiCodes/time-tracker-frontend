@@ -153,13 +153,9 @@ export default function TabsLayout() {
         },
       })}
     >
-      <Tabs.Screen
-        name="admin-dashboard"
-        options={{
-          title: "Dashboard",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
+      {role === "admin" && (
+        <Tabs.Screen name="admin" options={{ title: "Admin" }} />
+      )}
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
       <Tabs.Screen
