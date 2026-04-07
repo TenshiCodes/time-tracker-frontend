@@ -155,12 +155,6 @@ export default function TabsLayout() {
         },
       })}
     >
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
-      <Tabs.Screen
-        name="time"
-        options={{ title: "Time", href: role === "user" ? undefined : null }}
-      />
       {role === "admin" && (
         <Tabs.Screen name="admin-dashboard" options={{ title: "Dashboard" }} />
       )}
@@ -208,11 +202,18 @@ export default function TabsLayout() {
         options={{
           href: role ? undefined : null, // only show if logged in
           href: null,
+          title: "Settings",
         }}
       />
       <Tabs.Screen
         name="edit-time"
         options={{ href: role ? undefined : null, href: null }}
+      />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
+      <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
+      <Tabs.Screen
+        name="time"
+        options={{ title: "Time", href: role === "user" ? undefined : null }}
       />
     </Tabs>
   );
