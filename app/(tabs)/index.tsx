@@ -138,22 +138,57 @@ export default function Index() {
         </View>
       </SafeAreaView>
     );
+  } else {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.searchContainer}>
+          <Text style={styles.logo}>Home</Text>
+
+          <TextInput
+            value={query}
+            onChangeText={handleSearch}
+            placeholder="Search..."
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            style={styles.input}
+          />
+
+          {selectedItem && (
+            <Text
+              style={{
+                marginTop: 15,
+                fontSize: 32,
+                fontWeight: "bold",
+                color: isDark ? "#4CAF50" : "#2e7d32",
+              }}
+            >
+              {selectedItem.code}
+            </Text>
+          )}
+
+          {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
+
+          {results.length > 0 && (
+            <View style={styles.dropdown}>
+              <FlatList
+                data={results}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => handleSelect(item)}
+                    style={styles.item}
+                  >
+                    {highlightText(item.name, query)}
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+        </View>
+      </SafeAreaView>
+    );
   }
 
   // =====================================================
-  // 🏠 DEFAULT HOME SCREEN
-  // =====================================================
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.logo}>Home</Text>
-
-        <Text style={{ color: isDark ? "#aaa" : "#666" }}></Text>
-      </View>
-    </SafeAreaView>
-  );
-}
 
 // =====================================================
 // 🎨 STYLES
