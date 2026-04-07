@@ -13,7 +13,9 @@ export default function RootLayout() {
   const isDark = scheme === "dark";
 
   useEffect(() => {
-    if (Platform.OS === "web") return; // 🚫 skip EVERYTHING on web
+    if (Platform.OS === "web") {
+      return; // 🚀 instant render on web
+    }
 
     const prepare = async () => {
       try {

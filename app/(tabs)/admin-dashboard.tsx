@@ -9,7 +9,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { API_BASE } from "../config.js";
+import { API_BASE } from "../../config.js";
 
 type User = {
   id: number;
