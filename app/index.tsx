@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
+import Splash from "./splash";
 
 export default function Index() {
   const router = useRouter();
@@ -9,15 +10,17 @@ export default function Index() {
     const checkUser = async () => {
       const user = await AsyncStorage.getItem("user");
 
-      if (user) {
-        router.replace("/(tabs)"); // ✅ go to app
-      } else {
-        router.replace("/login"); // ✅ force login
-      }
+      setTimeout(() => {
+        if (user) {
+          router.replace("/(tabs)");
+        } else {
+          router.replace("/login");
+        }
+      }, 1500);
     };
 
     checkUser();
   }, []);
 
-  return null;
+  return <Splash />;
 }

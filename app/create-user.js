@@ -99,7 +99,7 @@ export default function CreateUser() {
             }}
           >
             <Image
-              source={require("../assets/images/logo_white_pbe.png")}
+              source={require("../assets/images/pbe_small.png")}
               style={{ width: 50, height: 50, resizeMode: "contain" }}
             />
           </TouchableOpacity>

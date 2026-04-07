@@ -67,7 +67,7 @@ export default function TabsLayout() {
         headerLeft: () => (
           <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
             <Image
-              source={require("../../assets/images/logo_white_pbe.png")}
+              source={require("../../assets/images/pbe_large.png")}
               style={{
                 width: 30,
                 height: 30,

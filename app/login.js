@@ -12,6 +12,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { API_BASE } from "../config";
 
 export default function Login() {
@@ -84,140 +85,149 @@ export default function Login() {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: isDark ? "#121212" : "#f2f2f2",
       }}
     >
-      {/* HEADER */}
-      <View
-        style={{
-          height: 80,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: colors.background,
-        }}
-      >
-        <TouchableOpacity
-          onPress={async () => {
-            const url = "https://pacificblueengineering.com";
-            const supported = await Linking.canOpenURL(url);
-            if (supported) {
-              await Linking.openURL(url);
-            } else {
-              console.log("Can't open URL:", url);
-            }
-          }}
-        >
-          <Image
-            source={require("../assets/images/logo_white_pbe.png")}
-            style={{ width: 50, height: 50, resizeMode: "contain" }}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* CONTENT */}
       <View
         style={{
           flex: 1,
-          justifyContent: "center",
-          padding: 20,
+          backgroundColor: colors.background,
         }}
       >
-        <Text
+        {/* HEADER */}
+        <View
           style={{
-            fontSize: 28,
-            marginBottom: 20,
-            color: colors.text,
+            height: 80,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: colors.background,
           }}
         >
-          Login
-        </Text>
+          <TouchableOpacity
+            onPress={async () => {
+              const url = "https://pacificblueengineering.com";
+              const supported = await Linking.canOpenURL(url);
+              if (supported) {
+                await Linking.openURL(url);
+              } else {
+                console.log("Can't open URL:", url);
+              }
+            }}
+          >
+            <Image
+              source={require("../assets/images/pbe_small.png")}
+              style={{ width: 50, height: 50, resizeMode: "contain" }}
+            />
+          </TouchableOpacity>
+        </View>
 
-        <TextInput
-          placeholder="Username"
-          placeholderTextColor={colors.placeholder}
-          value={username}
-          autoCapitalize="none" // ✅ mobile improvement
-          returnKeyType="next" // ✅ mobile improvement
-          onChangeText={(text) => {
-            setUsername(text);
-            setError("");
-          }}
+        {/* CONTENT */}
+        <View
           style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 8,
-            color: colors.text,
-            backgroundColor: colors.card,
+            flex: 1,
+            justifyContent: "center",
+            padding: 20,
           }}
-        />
-
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor={colors.placeholder}
-          secureTextEntry
-          value={password}
-          returnKeyType="done" // ✅ mobile improvement
-          onSubmitEditing={handleLogin} // ✅ mobile UX
-          onChangeText={(text) => {
-            setPassword(text);
-            setError("");
-          }}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 8,
-            color: colors.text,
-            backgroundColor: colors.card,
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() => router.push("/forgot-password")}
-          style={{ alignSelf: "flex-end", marginBottom: 10 }}
         >
-          <Text style={{ color: colors.button }}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        {error ? (
-          <Text style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}>
-            {error}
+          <Text
+            style={{
+              fontSize: 28,
+              marginBottom: 20,
+              color: colors.text,
+            }}
+          >
+            Login
           </Text>
-        ) : null}
 
-        {/* 🔥 LOGIN BUTTON */}
-        <TouchableOpacity
-          onPress={handleLogin}
-          disabled={loading}
-          activeOpacity={0.7} // ✅ better press feedback
-          style={{
-            backgroundColor: loading ? colors.disabled : colors.button,
-            padding: 15,
-            borderRadius: 8,
-            marginTop: 10,
-            opacity: loading ? 0.7 : 1, // ✅ visual feedback
-          }}
-        >
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            {loading ? "Logging in..." : "Login"}
-          </Text>
-        </TouchableOpacity>
+          <TextInput
+            placeholder="Username"
+            placeholderTextColor={colors.placeholder}
+            value={username}
+            autoCapitalize="none" // ✅ mobile improvement
+            returnKeyType="next" // ✅ mobile improvement
+            onChangeText={(text) => {
+              setUsername(text);
+              setError("");
+            }}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.border,
+              padding: 12,
+              marginBottom: 12,
+              borderRadius: 8,
+              color: colors.text,
+              backgroundColor: colors.card,
+            }}
+          />
 
-        <TouchableOpacity
-          onPress={() => router.push("/create-user")}
-          style={{ marginTop: 15 }}
-        >
-          <Text style={{ color: "#1F9BB7", textAlign: "center" }}>
-            Create Account
-          </Text>
-        </TouchableOpacity>
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={colors.placeholder}
+            secureTextEntry
+            value={password}
+            returnKeyType="done" // ✅ mobile improvement
+            onSubmitEditing={handleLogin} // ✅ mobile UX
+            onChangeText={(text) => {
+              setPassword(text);
+              setError("");
+            }}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.border,
+              padding: 12,
+              marginBottom: 12,
+              borderRadius: 8,
+              color: colors.text,
+              backgroundColor: colors.card,
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={() => router.push("/forgot-password")}
+            style={{ alignSelf: "flex-end", marginBottom: 10 }}
+          >
+            <Text style={{ color: colors.button }}>Forgot Password?</Text>
+          </TouchableOpacity>
+
+          {error ? (
+            <Text
+              style={{ color: isDark ? "#ff6b6b" : "red", marginBottom: 10 }}
+            >
+              {error}
+            </Text>
+          ) : null}
+
+          {/* 🔥 LOGIN BUTTON */}
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={loading}
+            activeOpacity={0.7} // ✅ better press feedback
+            style={{
+              backgroundColor: loading ? colors.disabled : colors.button,
+              padding: 15,
+              borderRadius: 8,
+              marginTop: 10,
+              opacity: loading ? 0.7 : 1, // ✅ visual feedback
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              {loading ? "Logging in..." : "Login"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/create-user")}
+            style={{ marginTop: 15 }}
+          >
+            <Text style={{ color: "#1F9BB7", textAlign: "center" }}>
+              Create Account
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
