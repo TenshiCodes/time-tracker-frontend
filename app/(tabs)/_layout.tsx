@@ -41,6 +41,7 @@ export default function TabsLayout() {
   // 👇 RUN ON MOUNT (CRITICAL)
   useEffect(() => {
     loadUser();
+    console.log("Role:", role);
   }, []);
 
   // 👇 RUN ON TAB FOCUS (GOOD)
