@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { API_BASE } from "../../config.js";
-
 type User = {
   id: number;
   first_name: string;
@@ -23,6 +22,10 @@ type Job = {
   name: string;
 };
 
+
+  setData([]);
+  setTotalHours(0);
+};
 export default function AdminDashboard() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
@@ -49,8 +52,15 @@ export default function AdminDashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState(0);
-
+  const resetState = () => {
+    setFilters({
+      user_id: "",
+      job_code: "",
+      start_date: "",
+      end_date: "",
+    });
   useEffect(() => {
+    resetState(); // 🔥 clears old data
     loadDropdowns();
     loadReport();
   }, []);

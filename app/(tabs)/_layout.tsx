@@ -16,6 +16,7 @@ export default function TabsLayout() {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("user");
     setRole(null); // ✅ prevent ghost admin
+    setUser(null);
     router.replace("/login");
   };
 
