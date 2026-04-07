@@ -13,28 +13,25 @@ export default function RootLayout() {
   const isDark = scheme === "dark";
 
   useEffect(() => {
-  if (Platform.OS === "web") return; // 🚫 skip EVERYTHING on web
+    if (Platform.OS === "web") return; // 🚫 skip EVERYTHING on web
 
-  const prepare = async () => {
-    try {
-      const update = await Updates.checkForUpdateAsync();
+    const prepare = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
 
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync();
-        return;
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (e) {
+        console.log("Startup error:", e);
+      } finally {
+        await SplashScreen.hideAsync();
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch (e) {
-      console.log("Startup error:", e);
-    } finally {
-      await SplashScreen.hideAsync();
-    }
-  };
-
-  prepare();
-}, []);
+    };
 
     prepare();
   }, []);
