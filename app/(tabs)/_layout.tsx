@@ -156,16 +156,20 @@ export default function TabsLayout() {
         },
       })}
     >
-      {role === "admin" && (
-        <Tabs.Screen name="admin-dashboard" options={{ title: "Dashboard" }} />
-      )}
-      {role === "admin" && (
-        <Tabs.Screen
-          name="index"
-          options={{ title: "Search" }}
-          initialParams={{ mode: "search" }}
-        />
-      )}
+      <Tabs.Screen
+        name="admin-dashboard"
+        options={{
+          title: "Dashboard",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="index"
+        options={{ title: "Search", href: role === "admin" ? undefined : null }}
+        initialParams={{ mode: "search" }}
+      />
+
       {/* 🔐 ADMIN ONLY */}
       <Tabs.Screen
         name="admin"
@@ -212,6 +216,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{ title: "Home", href: role === "user" ? undefined : null }}
+        initialParams={{ mode: "home" }}
       />
       <Tabs.Screen
         name="ticket"
