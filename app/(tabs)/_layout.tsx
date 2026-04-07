@@ -27,6 +27,7 @@ export default function TabsLayout() {
       if (storedUser) {
         const parsed = JSON.parse(storedUser);
         setRole(parsed.role);
+        console.log("Parsed User:", parsed);
         setUser(parsed); // 👈 ADD THIS
       } else {
         setRole(null);
@@ -42,6 +43,7 @@ export default function TabsLayout() {
   // 👇 RUN ON MOUNT (CRITICAL)
   useEffect(() => {
     loadUser();
+    console.log("Role:", role);
   }, []);
 
   // 👇 RUN ON TAB FOCUS (GOOD)
@@ -58,13 +60,13 @@ export default function TabsLayout() {
       screenOptions={({ route }) => ({
         headerShown: true,
 
+        // 🌗 Theme
         headerStyle: {
           backgroundColor: isDark ? "#121212" : "#fff",
         },
         headerTitleStyle: {
           color: isDark ? "#fff" : "#000",
         },
-
         headerLeft: () => (
           <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
             <Image
@@ -81,6 +83,7 @@ export default function TabsLayout() {
           </TouchableOpacity>
         ),
 
+        // 🔴 SIGN OUT BUTTON
         headerRight: () => (
           <View
             style={{
@@ -89,12 +92,13 @@ export default function TabsLayout() {
               marginRight: 10,
             }}
           >
+            {/* ⚙️ Settings */}
             <TouchableOpacity
               onPress={() => {
-                if (!user) return;
+                if (!user) return; // 🔒 only works if logged in
                 router.replace("/settings");
               }}
-              style={{ marginRight: 15, opacity: user ? 1 : 0.4 }}
+              style={{ marginRight: 15, opacity: user ? 1 : 0.4 }} // 👈 visual disable
               disabled={!user}
             >
               <Ionicons
@@ -103,8 +107,10 @@ export default function TabsLayout() {
                 color={isDark ? "#fff" : "#000"}
               />
             </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleLogout}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={{ marginRight: 15 }}
+            >
               <Ionicons
                 name="log-out-outline"
                 size={24}
@@ -114,61 +120,108 @@ export default function TabsLayout() {
           </View>
         ),
 
+        // 🌗 Tabs
         tabBarStyle: {
           backgroundColor: isDark ? "#121212" : "#fff",
         },
         tabBarActiveTintColor: "#4CAF50",
         tabBarInactiveTintColor: isDark ? "#aaa" : "#555",
 
+        // 🔹 Icons
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
-
           if (route.name === "admin-dashboard") {
             iconName = focused ? "document" : "document-outline";
           } else if (route.name === "index") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = focused ? "search" : "search-outline";
           } else if (route.name === "ticket") {
             iconName = focused ? "ticket" : "ticket-outline";
-          } else if (route.name === "time") {
-            iconName = focused ? "alarm" : "alarm-outline";
-          } else if (route.name === "users") {
-            iconName = focused ? "people" : "people-outline";
-          } else if (route.name === "create") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === "history") {
             iconName = focused ? "time" : "time-outline";
+          } else if (route.name === "create") {
+            iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === "admin") {
             iconName = focused
               ? "shield-checkmark"
               : "shield-checkmark-outline";
+          } else if (route.name === "create-user") {
+            iconName = focused ? "person-add" : "person-add-outline";
+          } else if (route.name === "users") {
+            iconName = focused ? "people" : "people-outline";
+          } else if (route.name === "time") {
+            iconName = focused ? "alarm" : "alarm-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      {/* 🟢 ADMIN VIEW */}
-      {role === "admin" ? (
-        <>
-          <Tabs.Screen
-            name="admin-dashboard"
-            options={{ title: "Dashboard" }}
-          />
-          <Tabs.Screen name="admin" options={{ title: "Requests" }} />
-          <Tabs.Screen name="create" options={{ title: "Create" }} />
-          <Tabs.Screen name="history" options={{ title: "History" }} />
-          <Tabs.Screen name="users" options={{ title: "Users" }} />
-        </>
-      ) : (
-        /* 🔵 USER VIEW */
-        <>
-          <Tabs.Screen name="index" options={{ title: "Home" }} />
-          <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
-          <Tabs.Screen name="time" options={{ title: "Time" }} />
-        </>
-      )}
+      <Tabs.Screen
+        name="admin-dashboard"
+        options={{
+          title: "Dashboard",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
 
-      {/* ⚙️ SHARED */}
+      <Tabs.Screen
+        name="admin"
+        options={{
+          title: "Requests",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="create"
+        options={{
+          title: "Create",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "History",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="users"
+        options={{
+          title: "Users",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
+
+      {/* 🔵 USER ONLY */}
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          href: role === "user" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="ticket"
+        options={{
+          title: "Ticket",
+          href: role === "user" ? undefined : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="time"
+        options={{
+          title: "Time",
+          href: role === "user" ? undefined : null,
+        }}
+      />
+
+      {/* ⚙️ SHARED (hidden from tabs) */}
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="edit-time" options={{ href: null }} />
     </Tabs>
