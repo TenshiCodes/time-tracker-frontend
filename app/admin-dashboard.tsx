@@ -260,9 +260,15 @@ export default function AdminDashboard() {
               <Text style={{ flex: 2, color: colors.text }}>
                 {start.toLocaleDateString()}
               </Text>
+
               <Text style={{ flex: 1, color: colors.text }}>{hrs}</Text>
+
               <Text style={{ flex: 2, color: colors.green }}>
                 {row.job_code}
+              </Text>
+
+              <Text style={{ flex: 3, color: colors.subText }}>
+                {row.job_name || "-"}
               </Text>
             </View>
           );

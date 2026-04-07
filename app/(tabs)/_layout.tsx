@@ -52,160 +52,118 @@ export default function TabsLayout() {
 
   if (loading) return null;
 
-  return (
-    <Tabs
-      screenOptions={({ route }) => ({
-        headerShown: true,
+ return (
+  <Tabs
+    screenOptions={({ route }) => ({
+      headerShown: true,
 
-        // 🌗 Theme
-        headerStyle: {
-          backgroundColor: isDark ? "#121212" : "#fff",
-        },
-        headerTitleStyle: {
-          color: isDark ? "#fff" : "#000",
-        },
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Image
-              source={require("../../assets/images/pbe_large.png")}
-              style={{
-                width: 30,
-                height: 30,
-                marginLeft: 10,
-                marginRight: 8,
-                marginTop: 2,
-                resizeMode: "contain",
-              }}
+      headerStyle: {
+        backgroundColor: isDark ? "#121212" : "#fff",
+      },
+      headerTitleStyle: {
+        color: isDark ? "#fff" : "#000",
+      },
+
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <Image
+            source={require("../../assets/images/pbe_large.png")}
+            style={{
+              width: 30,
+              height: 30,
+              marginLeft: 10,
+              marginRight: 8,
+              resizeMode: "contain",
+            }}
+          />
+        </TouchableOpacity>
+      ),
+
+      headerRight: () => (
+        <View style={{ flexDirection: "row", marginRight: 10 }}>
+          <TouchableOpacity
+            onPress={() => user && router.replace("/settings")}
+            style={{ marginRight: 15, opacity: user ? 1 : 0.4 }}
+            disabled={!user}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={isDark ? "#fff" : "#000"}
             />
           </TouchableOpacity>
-        ),
 
-        // 🔴 SIGN OUT BUTTON
-        headerRight: () => (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginRight: 10,
-            }}
-          >
-            {/* ⚙️ Settings */}
-            <TouchableOpacity
-              onPress={() => {
-                if (!user) return; // 🔒 only works if logged in
-                router.replace("/settings");
-              }}
-              style={{ marginRight: 15, opacity: user ? 1 : 0.4 }} // 👈 visual disable
-              disabled={!user}
-            >
-              <Ionicons
-                name="settings-outline"
-                size={24}
-                color={isDark ? "#fff" : "#000"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleLogout}
-              style={{ marginRight: 15 }}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={24}
-                color={isDark ? "#fff" : "#000"}
-              />
-            </TouchableOpacity>
-          </View>
-        ),
+          <TouchableOpacity onPress={handleLogout}>
+            <Ionicons
+              name="log-out-outline"
+              size={24}
+              color={isDark ? "#fff" : "#000"}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
 
-        // 🌗 Tabs
-        tabBarStyle: {
-          backgroundColor: isDark ? "#121212" : "#fff",
-        },
-        tabBarActiveTintColor: "#4CAF50",
-        tabBarInactiveTintColor: isDark ? "#aaa" : "#555",
+      tabBarStyle: {
+        backgroundColor: isDark ? "#121212" : "#fff",
+      },
+      tabBarActiveTintColor: "#4CAF50",
+      tabBarInactiveTintColor: isDark ? "#aaa" : "#555",
 
-        // 🔹 Icons
-        tabBarIcon: ({ color, size, focused }) => {
-          let iconName;
-          if (route.name === "admin-dashboard") {
-            iconName = focused ? "file" : "file-outline";
-          } else if (route.name === "index") {
+      tabBarIcon: ({ color, size, focused }) => {
+        let iconName;
+
+        switch (route.name) {
+          case "index":
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "ticket") {
+            break;
+          case "ticket":
             iconName = focused ? "ticket" : "ticket-outline";
-          } else if (route.name === "history") {
-            iconName = focused ? "time" : "time-outline";
-          } else if (route.name === "create") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
-          } else if (route.name === "admin") {
-            iconName = focused
-              ? "shield-checkmark"
-              : "shield-checkmark-outline";
-          } else if (route.name === "create-user") {
-            iconName = focused ? "person-add" : "person-add-outline";
-          } else if (route.name === "users") {
-            iconName = focused ? "people" : "people-outline";
-          } else if (route.name === "time") {
+            break;
+          case "time":
             iconName = focused ? "alarm" : "alarm-outline";
-          }
+            break;
+          case "admin-dashboard":
+            iconName = focused ? "file" : "file-outline";
+            break;
+          case "create":
+            iconName = focused ? "add-circle" : "add-circle-outline";
+            break;
+          case "history":
+            iconName = focused ? "time" : "time-outline";
+            break;
+          case "users":
+            iconName = focused ? "people" : "people-outline";
+            break;
+          default:
+            iconName = "ellipse";
+        }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
-      <Tabs.Screen
-        name="time"
-        options={{ title: "Time", href: role === "user" ? undefined : null }}
-      />
-      {role === "admin" && (
-        <Tabs.Screen name="admin-dashboard" options={{ title: "Admin" }} />
-      )}
-      {/* 🔐 ADMIN ONLY */}
-      <Tabs.Screen
-        name="admin"
-        options={{
-          title: "Admin",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+    })}
+  >
+    {/* ✅ ALWAYS */}
+    <Tabs.Screen name="index" options={{ title: "Home" }} />
+    <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
 
-      <Tabs.Screen
-        name="create"
-        options={{
-          title: "Create",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
+    {/* 👤 LOGGED IN USERS */}
+    {role && <Tabs.Screen name="time" options={{ title: "Time" }} />}
 
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: "History",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
+    {/* 🔐 ADMIN ONLY */}
+    {role === "admin" && (
+      <>
+        <Tabs.Screen
+          name="admin-dashboard"
+          options={{ title: "Dashboard" }}
+        />
+        <Tabs.Screen name="create" options={{ title: "Create" }} />
+        <Tabs.Screen name="history" options={{ title: "History" }} />
+        <Tabs.Screen name="users" options={{ title: "Users" }} />
+      </>
+    )}
 
-      <Tabs.Screen
-        name="users"
-        options={{
-          title: "Users",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
-
-      <Tabs.Screen
-        name="settings"
-        options={{
-          href: role ? undefined : null, // only show if logged in
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="edit-time"
-        options={{ href: role ? undefined : null, href: null }}
-      />
-    </Tabs>
-  );
-}
+    {/* 🚫 HIDDEN SCREENS (IMPORTANT) */}
+    <Tabs.Screen name="settings" options={{ href: null }} />
+    <Tabs.Screen name="edit-time" options={{ href: null }} />
+  </Tabs>
+);
