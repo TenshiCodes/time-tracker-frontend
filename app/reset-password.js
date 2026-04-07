@@ -151,10 +151,11 @@ export default function ResetPassword() {
         <TouchableOpacity
           onPress={handleReset}
           style={{
-            backgroundColor: colors.button,
-            padding: 15,
-            borderRadius: 8,
+            backgroundColor: "#1F9BB7",
+            padding: 16,
+            borderRadius: 12,
             marginTop: 10,
+            width: "100%",
           }}
         >
           <Text style={{ color: "#fff", textAlign: "center" }}>
