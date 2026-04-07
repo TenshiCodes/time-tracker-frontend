@@ -13,26 +13,28 @@ export default function RootLayout() {
   const isDark = scheme === "dark";
 
   useEffect(() => {
-    const prepare = async () => {
-      try {
-        // 🔥 Check for OTA update FIRST
-        const update = await Updates.checkForUpdateAsync();
+  if (Platform.OS === "web") return; // 🚫 skip EVERYTHING on web
 
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
-          await Updates.reloadAsync(); // reloads app
-          return; // stop here (app restarts)
-        }
+  const prepare = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
 
-        // ⏱ Optional delay (branding splash feel)
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      } catch (e) {
-        console.log("Startup error:", e);
-      } finally {
-        // ✅ Always hide splash
-        await SplashScreen.hideAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+        return;
       }
-    };
+
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    } catch (e) {
+      console.log("Startup error:", e);
+    } finally {
+      await SplashScreen.hideAsync();
+    }
+  };
+
+  prepare();
+}, []);
 
     prepare();
   }, []);

@@ -26,6 +26,7 @@ export default function TabsLayout() {
       if (storedUser) {
         const parsed = JSON.parse(storedUser);
         setRole(parsed.role);
+        console.log("Parsed User:", parsed);
         setUser(parsed); // 👈 ADD THIS
       } else {
         setRole(null);
