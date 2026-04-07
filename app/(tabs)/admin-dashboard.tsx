@@ -22,10 +22,6 @@ type Job = {
   name: string;
 };
 
-
-  setData([]);
-  setTotalHours(0);
-};
 export default function AdminDashboard() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
@@ -37,8 +33,8 @@ export default function AdminDashboard() {
     subText: isDark ? "#aaa" : "#666",
     border: isDark ? "#2e2e2e" : "#ddd",
     inputBg: isDark ? "#2a2a2a" : "#fff",
-    green: "#4CAF50",
-    orange: "#FF9800",
+    green: "#07bdff",
+    orange: "#2aa82a",
   };
 
   const [filters, setFilters] = useState({
@@ -47,11 +43,6 @@ export default function AdminDashboard() {
     start_date: "",
     end_date: "",
   });
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [data, setData] = useState<any[]>([]);
-  const [totalHours, setTotalHours] = useState(0);
   const resetState = () => {
     setFilters({
       user_id: "",
@@ -59,6 +50,15 @@ export default function AdminDashboard() {
       start_date: "",
       end_date: "",
     });
+
+    setData([]);
+    setTotalHours(0);
+  }; // ✅ THIS WAS MISSING
+  const [users, setUsers] = useState<User[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [data, setData] = useState<any[]>([]);
+  const [totalHours, setTotalHours] = useState(0);
+
   useEffect(() => {
     resetState(); // 🔥 clears old data
     loadDropdowns();
@@ -98,7 +98,6 @@ export default function AdminDashboard() {
     borderRadius: 8,
     marginBottom: 12,
   };
-
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
