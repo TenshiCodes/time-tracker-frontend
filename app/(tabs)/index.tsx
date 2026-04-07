@@ -190,60 +190,61 @@ export default function Index() {
 
   // =====================================================
 
-// =====================================================
-// 🎨 STYLES
-// =====================================================
+  // =====================================================
+  // 🎨 STYLES
+  // =====================================================
 
-function getStyles(isDark: boolean) {
-  return {
-    container: {
-      flex: 1,
-      backgroundColor: isDark ? "#121212" : "#f2f2f2",
-      justifyContent: "center",
-      alignItems: "center",
-    },
+  function getStyles(isDark: boolean) {
+    return {
+      container: {
+        flex: 1,
+        backgroundColor: isDark ? "#121212" : "#f2f2f2",
+        justifyContent: "center",
+        alignItems: "center",
+      },
 
-    searchContainer: {
-      width: "90%",
-      alignItems: "center",
-    },
+      searchContainer: {
+        width: "90%",
+        alignItems: "center",
+      },
 
-    logo: {
-      fontSize: 32,
-      marginBottom: 20,
-      color: isDark ? "#fff" : "#000",
-      fontWeight: "600",
-    },
+      logo: {
+        fontSize: 32,
+        marginBottom: 20,
+        color: isDark ? "#fff" : "#000",
+        fontWeight: "600",
+      },
 
-    input: {
-      width: "100%",
-      padding: 14,
-      borderRadius: 25,
-      backgroundColor: isDark ? "#1e1e1e" : "#fff",
-      borderWidth: 1,
-      borderColor: isDark ? "#333" : "#ddd",
-      color: isDark ? "#fff" : "#000",
-      elevation: 3,
-    },
+      input: {
+        width: "100%",
+        padding: 14,
+        borderRadius: 25,
+        backgroundColor: isDark ? "#1e1e1e" : "#fff",
+        borderWidth: 1,
+        borderColor: isDark ? "#333" : "#ddd",
+        color: isDark ? "#fff" : "#000",
+        elevation: 3,
+      },
 
-    dropdown: {
-      width: "100%",
-      marginTop: 10,
-      backgroundColor: isDark ? "#1e1e1e" : "#fff",
-      borderRadius: 10,
-      maxHeight: 250,
-      borderWidth: 1,
-      borderColor: isDark ? "#333" : "#ddd",
-    },
+      dropdown: {
+        width: "100%",
+        marginTop: 10,
+        backgroundColor: isDark ? "#1e1e1e" : "#fff",
+        borderRadius: 10,
+        maxHeight: 250,
+        borderWidth: 1,
+        borderColor: isDark ? "#333" : "#ddd",
+      },
 
-    item: {
-      padding: 14,
-      borderBottomWidth: 1,
-      borderColor: isDark ? "#333" : "#eee",
-    },
+      item: {
+        padding: 14,
+        borderBottomWidth: 1,
+        borderColor: isDark ? "#333" : "#eee",
+      },
 
-    itemText: {
-      color: isDark ? "#fff" : "#000",
-    },
-  };
+      itemText: {
+        color: isDark ? "#fff" : "#000",
+      },
+    };
+  }
 }
