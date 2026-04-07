@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { API_BASE } from "../config.js";
 
-// ✅ TYPES
 type User = {
   id: number;
   first_name: string;
@@ -29,12 +28,14 @@ export default function AdminDashboard() {
   const isDark = scheme === "dark";
 
   const colors = {
-    background: isDark ? "#121212" : "#f2f2f2",
-    card: isDark ? "#1e1e1e" : "#fff",
-    text: isDark ? "#fff" : "#000",
-    border: isDark ? "#333" : "#ccc",
-    inputBg: isDark ? "#1e1e1e" : "#fff",
-    button: "#4CAF50",
+    background: isDark ? "#0f0f0f" : "#f5f5f5",
+    card: isDark ? "#1c1c1c" : "#ffffff",
+    text: isDark ? "#ffffff" : "#000000",
+    subText: isDark ? "#aaa" : "#666",
+    border: isDark ? "#2e2e2e" : "#ddd",
+    inputBg: isDark ? "#2a2a2a" : "#fff",
+    green: "#4CAF50",
+    orange: "#FF9800",
   };
 
   const [filters, setFilters] = useState({
@@ -48,96 +49,44 @@ export default function AdminDashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  // 🔽 LOAD DROPDOWNS
-  const loadDropdowns = async () => {
-    try {
-      const [usersRes, jobsRes] = await Promise.all([
-        fetch(`${API_BASE}/admin/users`),
-        fetch(`${API_BASE}/admin/jobs`),
-      ]);
-
-      const usersData = await usersRes.json();
-      const jobsData = await jobsRes.json();
-
-      setUsers(usersData);
-      setJobs(jobsData);
-    } catch (err) {
-      console.log("Dropdown load error:", err);
-    }
-  };
-
-  // 🔄 LOAD REPORT
-  const loadReport = async () => {
-    try {
-      setLoading(true);
-
-      const params: any = {};
-      Object.entries(filters).forEach(([k, v]) => {
-        if (v) params[k] = v;
-      });
-
-      const query = new URLSearchParams(params).toString();
-
-      const res = await fetch(`${API_BASE}/admin/report?${query}`);
-      const result = await res.json();
-
-      setData(result.data || []);
-      setTotalHours(result.total_hours || 0);
-    } catch (err) {
-      console.log("Report error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     loadDropdowns();
     loadReport();
   }, []);
 
-  // ⏱ FORMAT TIME
-  const formatTime = (row: any) => {
-    if (!row.clock_out) return "Active";
+  const loadDropdowns = async () => {
+    const [u, j] = await Promise.all([
+      fetch(`${API_BASE}/admin/users`),
+      fetch(`${API_BASE}/admin/jobs`),
+    ]);
 
-    const start = new Date(row.clock_in);
-    const end = new Date(row.clock_out);
-
-    const diff = (end.getTime() - start.getTime()) / 1000;
-
-    const hrs = Math.floor(diff / 3600);
-    const mins = Math.floor((diff % 3600) / 60);
-
-    return `${hrs}:${mins.toString().padStart(2, "0")}`;
+    setUsers(await u.json());
+    setJobs(await j.json());
   };
 
-  // 📤 EXPORT
-  const handleExport = () => {
+  const loadReport = async () => {
     const params: any = {};
     Object.entries(filters).forEach(([k, v]) => {
       if (v) params[k] = v;
     });
 
     const query = new URLSearchParams(params).toString();
-    const url = `${API_BASE}/admin/export?${query}`;
+    const res = await fetch(`${API_BASE}/admin/report?${query}`);
+    const result = await res.json();
 
-    if (Platform.OS === "web") {
-      window.open(url, "_blank");
-    } else {
-      alert("Export works on web for now");
-    }
+    setData(result.data || []);
+    setTotalHours(result.total_hours || 0);
   };
 
-  // 🎨 COMMON INPUT STYLE
   const inputStyle = {
+    backgroundColor: colors.inputBg,
+    color: colors.text,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.inputBg,
     padding: 12,
-    marginBottom: 10,
     borderRadius: 8,
-    color: colors.text,
+    marginBottom: 12,
   };
 
   return (
@@ -145,83 +94,75 @@ export default function AdminDashboard() {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ padding: 20 }}
     >
-      <Text style={{ fontSize: 24, marginBottom: 15, color: colors.text }}>
+      <Text style={{ fontSize: 26, fontWeight: "600", color: colors.text }}>
         Admin Dashboard
       </Text>
 
-      {/* 🔍 FILTERS */}
+      {/* FILTER CARD */}
       <View
         style={{
           backgroundColor: colors.card,
-          padding: 15,
-          borderRadius: 10,
-          marginBottom: 15,
+          padding: 18,
+          borderRadius: 12,
+          marginTop: 15,
         }}
       >
-        {/* 👤 USER */}
-        <Text style={{ color: colors.text, marginBottom: 5 }}>User</Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 8,
-            marginBottom: 10,
-            backgroundColor: colors.inputBg,
-          }}
-        >
+        {/* USER */}
+        <Text style={{ color: colors.subText, marginBottom: 5 }}>User</Text>
+        <View style={[inputStyle, { padding: 0 }]}>
           <Picker
             selectedValue={filters.user_id}
-            onValueChange={(value) =>
-              setFilters({ ...filters, user_id: String(value) })
+            onValueChange={(v) =>
+              setFilters({ ...filters, user_id: String(v) })
             }
             dropdownIconColor={colors.text}
-            style={{ color: colors.text }}
+            style={{
+              color: colors.text,
+              backgroundColor:
+                Platform.OS === "web" ? colors.inputBg : "transparent",
+            }}
           >
             <Picker.Item label="All Users" value="" />
             {users.map((u) => (
               <Picker.Item
                 key={u.id}
                 label={`${u.first_name} ${u.last_name}`}
-                value={String(u.id)}
+                value={u.id}
               />
             ))}
           </Picker>
         </View>
 
-        {/* 💼 JOB */}
-        <Text style={{ color: colors.text, marginBottom: 5 }}>Job</Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 8,
-            marginBottom: 10,
-            backgroundColor: colors.inputBg,
-          }}
-        >
+        {/* JOB */}
+        <Text style={{ color: colors.subText, marginBottom: 5 }}>Job</Text>
+        <View style={[inputStyle, { padding: 0 }]}>
           <Picker
             selectedValue={filters.job_code}
-            onValueChange={(value) =>
-              setFilters({ ...filters, job_code: String(value) })
+            onValueChange={(v) =>
+              setFilters({ ...filters, job_code: String(v) })
             }
             dropdownIconColor={colors.text}
-            style={{ color: colors.text }}
+            style={{
+              color: colors.text,
+              backgroundColor:
+                Platform.OS === "web" ? colors.inputBg : "transparent",
+            }}
           >
             <Picker.Item label="All Jobs" value="" />
-            {jobs.map((job) => (
+            {jobs.map((j) => (
               <Picker.Item
-                key={job.id}
-                label={`${job.code} - ${job.name}`}
-                value={job.code}
+                key={j.id}
+                label={`${j.code} - ${j.name}`}
+                value={j.code}
               />
             ))}
           </Picker>
         </View>
 
-        {/* 📅 DATES */}
+        {/* DATES */}
         <TextInput
           placeholder="Start Date (YYYY-MM-DD)"
-          placeholderTextColor={isDark ? "#888" : "#666"}
+          placeholderTextColor={colors.subText}
           value={filters.start_date}
           onChangeText={(t) => setFilters({ ...filters, start_date: t })}
           style={inputStyle}
@@ -229,7 +170,7 @@ export default function AdminDashboard() {
 
         <TextInput
           placeholder="End Date (YYYY-MM-DD)"
-          placeholderTextColor={isDark ? "#888" : "#666"}
+          placeholderTextColor={colors.subText}
           value={filters.end_date}
           onChangeText={(t) => setFilters({ ...filters, end_date: t })}
           style={inputStyle}
@@ -239,8 +180,8 @@ export default function AdminDashboard() {
         <TouchableOpacity
           onPress={loadReport}
           style={{
-            backgroundColor: colors.button,
-            padding: 12,
+            backgroundColor: colors.green,
+            padding: 14,
             borderRadius: 8,
             marginBottom: 10,
           }}
@@ -251,10 +192,9 @@ export default function AdminDashboard() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={handleExport}
           style={{
-            backgroundColor: "#FF9800",
-            padding: 12,
+            backgroundColor: colors.orange,
+            padding: 14,
             borderRadius: 8,
           }}
         >
@@ -262,34 +202,71 @@ export default function AdminDashboard() {
         </TouchableOpacity>
       </View>
 
-      {/* ⏱ TOTAL */}
-      <Text style={{ fontSize: 18, marginBottom: 10, color: "#4CAF50" }}>
-        Total Hours: {loading ? "..." : totalHours}
+      {/* TOTAL */}
+      <Text
+        style={{
+          color: colors.green,
+          fontSize: 18,
+          marginTop: 15,
+          marginBottom: 10,
+        }}
+      >
+        Total Hours: {totalHours}
       </Text>
 
-      {/* DATA */}
-      {data.map((row) => (
+      {/* 📊 TABLE (EXCEL STYLE) */}
+      <View
+        style={{
+          backgroundColor: colors.card,
+          borderRadius: 10,
+          overflow: "hidden",
+        }}
+      >
+        {/* HEADER */}
         <View
-          key={row.id}
           style={{
-            backgroundColor: colors.card,
-            padding: 15,
-            borderRadius: 10,
-            marginBottom: 10,
+            flexDirection: "row",
+            backgroundColor: isDark ? "#2a2a2a" : "#eee",
+            padding: 12,
           }}
         >
-          <Text style={{ color: colors.text }}>
-            {new Date(row.clock_in).toLocaleDateString()}
-          </Text>
-
-          <Text style={{ color: colors.text }}>{formatTime(row)}</Text>
-
-          {/* ✅ FIXED */}
-          <Text style={{ color: "#4CAF50" }}>
-            {row.job_name ? `${row.job_code} - ${row.job_name}` : row.job_code}
-          </Text>
+          <Text style={{ flex: 2, color: colors.text }}>Date</Text>
+          <Text style={{ flex: 1, color: colors.text }}>Hours</Text>
+          <Text style={{ flex: 2, color: colors.text }}>Job</Text>
         </View>
-      ))}
+
+        {/* ROWS */}
+        {data.map((row, i) => {
+          const start = new Date(row.clock_in);
+          const end = row.clock_out ? new Date(row.clock_out) : null;
+
+          let hrs = "-";
+          if (end) {
+            const diff = (end.getTime() - start.getTime()) / 3600 / 1000;
+            hrs = diff.toFixed(2);
+          }
+
+          return (
+            <View
+              key={row.id}
+              style={{
+                flexDirection: "row",
+                padding: 12,
+                backgroundColor:
+                  i % 2 === 0 ? colors.card : isDark ? "#181818" : "#fafafa",
+              }}
+            >
+              <Text style={{ flex: 2, color: colors.text }}>
+                {start.toLocaleDateString()}
+              </Text>
+              <Text style={{ flex: 1, color: colors.text }}>{hrs}</Text>
+              <Text style={{ flex: 2, color: colors.green }}>
+                {row.job_code}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }
