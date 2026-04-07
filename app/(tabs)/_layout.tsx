@@ -166,7 +166,7 @@ export default function TabsLayout() {
 
       <Tabs.Screen
         name="index"
-        options={{ title: "Search", href: role === "admin" ? undefined : null }}
+        options={{ title: "Search" }}
         initialParams={{ mode: "search" }}
       />
 
@@ -213,11 +213,7 @@ export default function TabsLayout() {
         name="edit-time"
         options={{ href: role ? undefined : null, href: null }}
       />
-      <Tabs.Screen
-        name="index"
-        options={{ title: "Home", href: role === "user" ? undefined : null }}
-        initialParams={{ mode: "home" }}
-      />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen
         name="ticket"
         options={{ title: "Ticket", href: role === "user" ? undefined : null }}
