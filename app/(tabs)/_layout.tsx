@@ -156,14 +156,17 @@ export default function TabsLayout() {
         },
       })}
     >
-      <Tabs.Screen
-        name="admin-dashboard"
-        options={{
-          title: "Dashboard",
-          href: role === "admin" ? undefined : null,
-        }}
-      />
-
+      {role === "admin" && (
+        <Tabs.Screen name="admin-dashboard" options={{ title: "Dashboard" }} />
+      )}
+      {role === "admin" && (
+        <Tabs.Screen
+          name="index"
+          options={{ title: "Search" }}
+          initialParams={{ mode: "search" }}
+        />
+      )}
+      {/* 🔐 ADMIN ONLY */}
       <Tabs.Screen
         name="admin"
         options={{
@@ -171,7 +174,6 @@ export default function TabsLayout() {
           href: role === "admin" ? undefined : null,
         }}
       />
-
       <Tabs.Screen
         name="create"
         options={{
@@ -196,34 +198,29 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* 🔵 USER ONLY */}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: role ? undefined : null, // only show if logged in
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="edit-time"
+        options={{ href: role ? undefined : null, href: null }}
+      />
       <Tabs.Screen
         name="index"
-        options={{
-          title: "Home",
-          href: role === "user" ? undefined : null,
-        }}
+        options={{ title: "Home", href: role === "user" ? undefined : null }}
       />
-
       <Tabs.Screen
         name="ticket"
-        options={{
-          title: "Ticket",
-          href: role === "user" ? undefined : null,
-        }}
+        options={{ title: "Ticket", href: role === "user" ? undefined : null }}
       />
-
       <Tabs.Screen
         name="time"
-        options={{
-          title: "Time",
-          href: role === "user" ? undefined : null,
-        }}
+        options={{ title: "Time", href: role === "user" ? undefined : null }}
       />
-
-      {/* ⚙️ SHARED (hidden from tabs) */}
-      <Tabs.Screen name="settings" options={{ href: null }} />
-      <Tabs.Screen name="edit-time" options={{ href: null }} />
     </Tabs>
   );
 }
