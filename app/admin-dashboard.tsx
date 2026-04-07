@@ -232,7 +232,8 @@ export default function AdminDashboard() {
         >
           <Text style={{ flex: 2, color: colors.text }}>Date</Text>
           <Text style={{ flex: 1, color: colors.text }}>Hours</Text>
-          <Text style={{ flex: 2, color: colors.text }}>Job</Text>
+          <Text style={{ flex: 2, color: colors.text }}>Job Code</Text>
+          <Text style={{ flex: 3, color: colors.text }}>Job Name</Text>
         </View>
 
         {/* ROWS */}
