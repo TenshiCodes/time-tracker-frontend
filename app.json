@@ -1,63 +1,82 @@
 {
   "expo": {
-    "name": "testApp",
-    "slug": "testApp",
+    "name": "PBE Time App",
+    "slug": "cleanApp",
     "version": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/b14513c4-7612-4b07-93de-6b8bd0cda99f"
+    "orientation": "portrait",
+    "icon": "./assets/images/pbe_small.png",
+    "scheme": "cleanapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pacificblueengineering.timeapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.tenshicodes.cleanapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/pbe_small.png",
+        "resizeMode": "contain"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "splash": {
+      "image": "./assets/images/pbe_large.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./assets/images/pbe_large.png",
+        "backgroundColor": "#000000"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "399ca44d-63ac-493c-a3fc-2addc45846fb"
+      }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "orientation": "portrait",
-    "icon": "./assets/images/logo_white_pbe.png",
-    "scheme": "testapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.pacificblueengineering.timeapp"
-    },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/logo_white_pbe.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
-        }
-      ],
-      "@react-native-community/datetimepicker"
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "b14513c4-7612-4b07-93de-6b8bd0cda99f"
+    "updates": {
+      "url": "https://u.expo.dev/399ca44d-63ac-493c-a3fc-2addc45846fb"
+    }
+  },
+  "web": {
+    "output": "static",
+    "favicon": "./assets/images/pbe_fav.png"
+  },
+  "plugins": [
+    "expo-router",
+    "@react-native-community/datetimepicker",
+    [
+      "expo-splash-screen",
+      {
+        "image": "./assets/images/pbe_large.png",
+        "imageWidth": 170,
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
       }
-    },
-    "owner": "tenshicodes"
-  }
+    ]
+  ],
+  "experiments": {
+    "typedRoutes": true,
+    "reactCompiler": true
+  },
+  "runtimeVersion": {
+    "policy": "appVersion"
+  },
+  "updates": {
+    "url": "https://u.expo.dev/399ca44d-63ac-493c-a3fc-2addc45846fb"
+  },
+  "extra": {
+    "router": {},
+    "eas": {
+      "projectId": "399ca44d-63ac-493c-a3fc-2addc45846fb"
+    }
+  },
+  "owner": "tenshicodes"
 }
