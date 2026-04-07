@@ -71,12 +71,11 @@ export default function Login() {
           id: data.id,
         }),
       );
-
-      if (__DEV__) {
-        console.log("");
+      if (role === "admin") {
+        router.replace("/(tabs)/admin-dashboard");
+      } else {
+        router.replace("/(tabs)");
       }
-
-      router.replace("/(tabs)");
     } catch (err) {
       Alert.alert("Error", "Network error");
     } finally {

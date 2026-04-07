@@ -1,7 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, useColorScheme, View } from "react-native";
+import {
+  Animated,
+  Platform,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from "react-native";
 
 export default function Splash() {
   const router = useRouter();
@@ -30,6 +36,9 @@ export default function Splash() {
   const logo = require("../assets/images/logo_white_pbe.png");
 
   useEffect(() => {
+    if (Platform.OS === "web") {
+      return; // 🚀 instant render on web
+    }
     const runAnimation = async () => {
       // 🔥 FADE IN + SCALE + ROTATE + GLOW
       await new Promise<void>((resolve) => {
