@@ -1,14 +1,27 @@
+import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    useColorScheme,
-    View,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from "react-native";
 import { API_BASE } from "../config.js";
+
+// ✅ TYPES (fixes TS issues)
+type User = {
+  id: number;
+  first_name: string;
+  last_name: string;
+};
+
+type Job = {
+  job_code: string;
+  job_name: string;
+};
 
 export default function AdminDashboard() {
   const scheme = useColorScheme();
@@ -29,18 +42,41 @@ export default function AdminDashboard() {
     end_date: "",
   });
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  // 🔽 LOAD DROPDOWNS
+  const loadDropdowns = async () => {
+    try {
+      const [usersRes, jobsRes] = await Promise.all([
+        fetch(`${API_BASE}/admin/users`),
+        fetch(`${API_BASE}/admin/jobs`),
+      ]);
+
+      const usersData = await usersRes.json();
+      const jobsData = await jobsRes.json();
+
+      setUsers(usersData);
+      setJobs(jobsData);
+    } catch (err) {
+      console.log("Dropdown load error:", err);
+    }
+  };
 
   // 🔄 LOAD REPORT
   const loadReport = async () => {
     try {
-      const query = new URLSearchParams(
-        Object.entries(filters).reduce((acc, [k, v]) => {
-          if (v) acc[k] = v;
-          return acc;
-        }, {} as any),
-      ).toString();
+      setLoading(true);
+
+      const params: any = {};
+      Object.entries(filters).forEach(([k, v]) => {
+        if (v) params[k] = v;
+      });
+
+      const query = new URLSearchParams(params).toString();
 
       const res = await fetch(`${API_BASE}/admin/report?${query}`);
       const result = await res.json();
@@ -49,10 +85,13 @@ export default function AdminDashboard() {
       setTotalHours(result.total_hours || 0);
     } catch (err) {
       console.log("Report error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    loadDropdowns();
     loadReport();
   }, []);
 
@@ -73,13 +112,17 @@ export default function AdminDashboard() {
 
   // 📤 EXPORT
   const handleExport = () => {
-    const query = new URLSearchParams(filters as any).toString();
+    const params: any = {};
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v) params[k] = v;
+    });
+
+    const query = new URLSearchParams(params).toString();
     const url = `${API_BASE}/admin/export?${query}`;
 
     if (Platform.OS === "web") {
       window.open(url, "_blank");
     } else {
-      // reuse your existing file download/share logic later
       alert("Export works on web for now");
     }
   };
@@ -89,14 +132,7 @@ export default function AdminDashboard() {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ padding: 20 }}
     >
-      {/* TITLE */}
-      <Text
-        style={{
-          fontSize: 24,
-          marginBottom: 15,
-          color: colors.text,
-        }}
-      >
+      <Text style={{ fontSize: 24, marginBottom: 15, color: colors.text }}>
         Admin Dashboard
       </Text>
 
@@ -109,36 +145,65 @@ export default function AdminDashboard() {
           marginBottom: 15,
         }}
       >
-        <TextInput
-          placeholder="User ID"
-          placeholderTextColor="#888"
-          value={filters.user_id}
-          onChangeText={(t) => setFilters({ ...filters, user_id: t })}
+        {/* 👤 USER */}
+        <Text style={{ color: colors.text, marginBottom: 5 }}>User</Text>
+        <View
           style={{
             borderWidth: 1,
             borderColor: colors.border,
-            padding: 10,
-            marginBottom: 10,
             borderRadius: 8,
-            color: colors.text,
+            marginBottom: 10,
           }}
-        />
+        >
+          <Picker
+            selectedValue={filters.user_id}
+            onValueChange={
+              (value) => setFilters({ ...filters, user_id: String(value) }) // ✅ FIX
+            }
+            dropdownIconColor={colors.text}
+            style={{ color: colors.text }}
+          >
+            <Picker.Item label="All Users" value="" />
+            {users.map((u) => (
+              <Picker.Item
+                key={u.id}
+                label={`${u.first_name} ${u.last_name}`}
+                value={String(u.id)}
+              />
+            ))}
+          </Picker>
+        </View>
 
-        <TextInput
-          placeholder="Job Code"
-          placeholderTextColor="#888"
-          value={filters.job_code}
-          onChangeText={(t) => setFilters({ ...filters, job_code: t })}
+        {/* 💼 JOB */}
+        <Text style={{ color: colors.text, marginBottom: 5 }}>Job</Text>
+        <View
           style={{
             borderWidth: 1,
             borderColor: colors.border,
-            padding: 10,
-            marginBottom: 10,
             borderRadius: 8,
-            color: colors.text,
+            marginBottom: 10,
           }}
-        />
+        >
+          <Picker
+            selectedValue={filters.job_code}
+            onValueChange={
+              (value) => setFilters({ ...filters, job_code: String(value) }) // ✅ FIX
+            }
+            dropdownIconColor={colors.text}
+            style={{ color: colors.text }}
+          >
+            <Picker.Item label="All Jobs" value="" />
+            {jobs.map((job) => (
+              <Picker.Item
+                key={job.job_code}
+                label={`${job.job_code} - ${job.job_name}`}
+                value={job.job_code}
+              />
+            ))}
+          </Picker>
+        </View>
 
+        {/* 📅 DATES */}
         <TextInput
           placeholder="Start Date (YYYY-MM-DD)"
           placeholderTextColor="#888"
@@ -169,6 +234,7 @@ export default function AdminDashboard() {
           }}
         />
 
+        {/* BUTTONS */}
         <TouchableOpacity
           onPress={loadReport}
           style={{
@@ -196,85 +262,29 @@ export default function AdminDashboard() {
       </View>
 
       {/* ⏱ TOTAL */}
-      <Text
-        style={{
-          fontSize: 18,
-          marginBottom: 10,
-          color: "#4CAF50",
-        }}
-      >
-        Total Hours: {totalHours}
+      <Text style={{ fontSize: 18, marginBottom: 10, color: "#4CAF50" }}>
+        Total Hours: {loading ? "..." : totalHours}
       </Text>
 
-      {/* 🌐 WEB TABLE */}
-      {Platform.OS === "web" ? (
-        <View style={{ backgroundColor: colors.card, borderRadius: 10 }}>
-          {/* HEADER */}
-          <View
-            style={{
-              flexDirection: "row",
-              padding: 10,
-              borderBottomWidth: 1,
-              borderColor: colors.border,
-            }}
-          >
-            <Text style={{ flex: 1, color: colors.text }}>Date</Text>
-            <Text style={{ flex: 1, color: colors.text }}>Time</Text>
-            <Text style={{ flex: 1, color: colors.text }}>Project</Text>
-            <Text style={{ flex: 1, color: colors.text }}>Customer</Text>
-          </View>
-
-          {/* ROWS */}
-          {data.map((row) => (
-            <View
-              key={row.id}
-              style={{
-                flexDirection: "row",
-                padding: 10,
-                borderBottomWidth: 1,
-                borderColor: "#333",
-              }}
-            >
-              <Text style={{ flex: 1, color: colors.text }}>
-                {new Date(row.clock_in).toLocaleDateString()}
-              </Text>
-
-              <Text style={{ flex: 1, color: colors.text }}>
-                {formatTime(row)}
-              </Text>
-
-              <Text style={{ flex: 1, color: "#4CAF50" }}>{row.job_code}</Text>
-
-              <Text style={{ flex: 1, color: "#888" }}>
-                {row.customer || "-"}
-              </Text>
-            </View>
-          ))}
+      {/* DATA */}
+      {data.map((row) => (
+        <View
+          key={row.id}
+          style={{
+            backgroundColor: colors.card,
+            padding: 15,
+            borderRadius: 10,
+            marginBottom: 10,
+          }}
+        >
+          <Text style={{ color: colors.text }}>
+            {new Date(row.clock_in).toLocaleDateString()}
+          </Text>
+          <Text style={{ color: colors.text }}>{formatTime(row)}</Text>
+          <Text style={{ color: "#4CAF50" }}>{row.job_code}</Text>
+          <Text style={{ color: "#888" }}>{row.customer || "-"}</Text>
         </View>
-      ) : (
-        // 📱 MOBILE CARDS
-        data.map((row) => (
-          <View
-            key={row.id}
-            style={{
-              backgroundColor: colors.card,
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 10,
-            }}
-          >
-            <Text style={{ color: colors.text }}>
-              {new Date(row.clock_in).toLocaleDateString()}
-            </Text>
-
-            <Text style={{ color: colors.text }}>{formatTime(row)}</Text>
-
-            <Text style={{ color: "#4CAF50" }}>{row.job_code}</Text>
-
-            <Text style={{ color: "#888" }}>{row.customer || "-"}</Text>
-          </View>
-        ))
-      )}
+      ))}
     </ScrollView>
   );
 }

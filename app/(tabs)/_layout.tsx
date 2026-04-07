@@ -127,8 +127,9 @@ export default function TabsLayout() {
         // 🔹 Icons
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
-
-          if (route.name === "index") {
+          if (route.name === "admin-dashboard") {
+            iconName = focused ? "file" : "file-outline";
+          } else if (route.name === "index") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "ticket") {
             iconName = focused ? "ticket" : "ticket-outline";
@@ -152,6 +153,13 @@ export default function TabsLayout() {
         },
       })}
     >
+      <Tabs.Screen
+        name="admin-dashboard"
+        options={{
+          title: "Dashboard",
+          href: role === "admin" ? undefined : null,
+        }}
+      />
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="ticket" options={{ title: "Ticket" }} />
       <Tabs.Screen
