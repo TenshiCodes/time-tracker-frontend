@@ -58,6 +58,7 @@ export default function AdminDashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [data, setData] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState(0);
+  const [totalSeconds, setTotalSeconds] = useState(0);
 
   useEffect(() => {
     resetState(); // 🔥 clears old data
@@ -86,7 +87,7 @@ export default function AdminDashboard() {
     const result = await res.json();
 
     setData(result.data || []);
-    setTotalHours(result.total_hours || 0);
+    setTotalSeconds(result.total_seconds || 0);
   };
 
   const inputStyle = {
@@ -97,6 +98,12 @@ export default function AdminDashboard() {
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
+  };
+  const formatHHMM = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+
+    return `${hrs}:${mins.toString().padStart(2, "0")}`;
   };
   return (
     <ScrollView
@@ -220,7 +227,7 @@ export default function AdminDashboard() {
           marginBottom: 10,
         }}
       >
-        Total Hours: {totalHours}
+        Total Hours: {formatHHMM(totalSeconds)}
       </Text>
 
       {/* 📊 TABLE (EXCEL STYLE) */}
@@ -252,8 +259,8 @@ export default function AdminDashboard() {
 
           let hrs = "-";
           if (end) {
-            const diff = (end.getTime() - start.getTime()) / 3600 / 1000;
-            hrs = diff.toFixed(2);
+            const diffSeconds = (end.getTime() - start.getTime()) / 1000;
+            hrs = formatHHMM(diffSeconds);
           }
 
           return (
