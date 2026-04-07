@@ -130,7 +130,7 @@ export default function TabsLayout() {
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
           if (route.name === "admin-dashboard") {
-            iconName = focused ? "file" : "file-outline";
+            iconName = focused ? "document" : "document-outline";
           } else if (route.name === "index") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "ticket") {
@@ -162,13 +162,13 @@ export default function TabsLayout() {
         options={{ title: "Time", href: role === "user" ? undefined : null }}
       />
       {role === "admin" && (
-        <Tabs.Screen name="admin-dashboard" options={{ title: "Admin" }} />
+        <Tabs.Screen name="admin-dashboard" options={{ title: "Dashboard" }} />
       )}
       {/* 🔐 ADMIN ONLY */}
       <Tabs.Screen
         name="admin"
         options={{
-          title: "Admin",
+          title: "Requests",
           href: role === "admin" ? undefined : null,
         }}
       />
