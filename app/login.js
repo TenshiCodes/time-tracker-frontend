@@ -71,7 +71,9 @@ export default function Login() {
           id: data.id,
         }),
       );
-      if (role === "admin") {
+
+      // ✅ FIXED
+      if (data.role === "admin") {
         router.replace("/(tabs)/admin-dashboard");
       } else {
         router.replace("/(tabs)");
