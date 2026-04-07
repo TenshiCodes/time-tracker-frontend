@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,15 +14,19 @@ import {
 import { API_BASE } from "../../config";
 
 export default function Index() {
-  const scheme = useColorScheme(); // 🌗 detect system theme
+  const { mode } = useLocalSearchParams(); // ✅ mode detection
+
+  const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
   const styles = getStyles(isDark);
 
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  // 🔄 reset when screen refocuses
   useFocusEffect(
     useCallback(() => {
       setQuery("");
@@ -29,7 +34,8 @@ export default function Index() {
       setSelectedItem(null);
     }, []),
   );
-  const handleSearch = async (text) => {
+
+  const handleSearch = async (text: string) => {
     setQuery(text);
 
     if (!text.trim()) {
@@ -40,7 +46,6 @@ export default function Index() {
     try {
       setLoading(true);
 
-      // ⚠️ CHANGE THIS
       const res = await fetch(`${API_BASE}/search?q=${text}`);
       const data = await res.json();
 
@@ -53,8 +58,7 @@ export default function Index() {
     }
   };
 
-  // 👇 highlight function
-  const highlightText = (text, query) => {
+  const highlightText = (text: string, query: string) => {
     if (!query) return <Text style={styles.itemText}>{text}</Text>;
 
     const words = query.split(" ");
@@ -76,64 +80,86 @@ export default function Index() {
     );
   };
 
-  const handleSelect = (item) => {
+  const handleSelect = (item: any) => {
     setQuery(item.name);
-    setSelectedItem(item); // 👈 store full item (with code)
+    setSelectedItem(item);
     setResults([]);
   };
 
+  // =====================================================
+  // 🔥 CONDITIONAL UI BASED ON MODE
+  // =====================================================
+
+  if (mode === "search") {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.searchContainer}>
+          <Text style={styles.logo}>Search</Text>
+
+          <TextInput
+            value={query}
+            onChangeText={handleSearch}
+            placeholder="Search..."
+            placeholderTextColor={isDark ? "#aaa" : "#666"}
+            style={styles.input}
+          />
+
+          {selectedItem && (
+            <Text
+              style={{
+                marginTop: 15,
+                fontSize: 32,
+                fontWeight: "bold",
+                color: isDark ? "#4CAF50" : "#2e7d32",
+              }}
+            >
+              {selectedItem.code}
+            </Text>
+          )}
+
+          {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
+
+          {results.length > 0 && (
+            <View style={styles.dropdown}>
+              <FlatList
+                data={results}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => handleSelect(item)}
+                    style={styles.item}
+                  >
+                    {highlightText(item.name, query)}
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // =====================================================
+  // 🏠 DEFAULT HOME SCREEN
+  // =====================================================
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Text style={styles.logo}>Search</Text>
+      <View style={{ alignItems: "center" }}>
+        <Text style={styles.logo}>Home</Text>
 
-        <TextInput
-          value={query}
-          onChangeText={handleSearch}
-          placeholder="Search..."
-          placeholderTextColor={isDark ? "#aaa" : "#666"}
-          style={styles.input}
-        />
-
-        {selectedItem && (
-          <Text
-            style={{
-              marginTop: 15,
-              fontSize: 32,
-              fontWeight: "bold",
-              color: isDark ? "#4CAF50" : "#2e7d32",
-            }}
-          >
-            {selectedItem.code}
-          </Text>
-        )}
-
-        {/* ⏳ Loading */}
-        {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
-
-        {/* 📋 Results */}
-        {results.length > 0 && (
-          <View style={styles.dropdown}>
-            <FlatList
-              data={results}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => handleSelect(item)}
-                  style={styles.item}
-                >
-                  {highlightText(item.name, query)}
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        )}
+        <Text style={{ color: isDark ? "#aaa" : "#666" }}></Text>
       </View>
     </SafeAreaView>
   );
 }
 
-function getStyles(isDark) {
+// =====================================================
+// 🎨 STYLES
+// =====================================================
+
+function getStyles(isDark: boolean) {
   return {
     container: {
       flex: 1,
