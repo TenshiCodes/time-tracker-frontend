@@ -37,7 +37,18 @@ export default function Splash() {
 
   useEffect(() => {
     if (Platform.OS === "web") {
-      return; // 🚀 instant render on web
+      (async () => {
+        const storedUser = await AsyncStorage.getItem("user");
+        const user = storedUser ? JSON.parse(storedUser) : null;
+
+        if (user) {
+          router.replace("/(tabs)");
+        } else {
+          router.replace("/login");
+        }
+      })();
+
+      return;
     }
     const runAnimation = async () => {
       // 🔥 FADE IN + SCALE + ROTATE + GLOW
