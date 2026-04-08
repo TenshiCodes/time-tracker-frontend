@@ -33,7 +33,7 @@ export default function Splash() {
   });
 
   // ✅ Use ONE logo + tint
-  const logo = require("../assets/images/logo_white_pbe.png");
+  const logo = require("../assets/images/pbe_large.png");
 
   useEffect(() => {
     if (Platform.OS === "web") {

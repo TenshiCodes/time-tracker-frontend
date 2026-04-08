@@ -25,7 +25,7 @@ export default function RootLayout() {
         }
 
         // ⏱ Optional delay (branding splash feel)
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (e) {
         console.log("Startup error:", e);
       } finally {
