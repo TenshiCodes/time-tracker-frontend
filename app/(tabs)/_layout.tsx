@@ -205,6 +205,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="settings"
         options={{
+          title: "Settings",
           href: role ? undefined : null, // only show if logged in
           href: null,
         }}
