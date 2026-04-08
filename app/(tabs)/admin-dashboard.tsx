@@ -208,6 +208,28 @@ export default function AdminDashboard() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={async () => {
+            try {
+              const params: any = {};
+              Object.entries(filters).forEach(([k, v]) => {
+                if (v) params[k] = v;
+              });
+
+              const query = new URLSearchParams(params).toString();
+
+              const res = await fetch(`${API_BASE}/admin/export?${query}`);
+
+              const blob = await res.blob();
+              const url = window.URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "admin_report.xlsx";
+              a.click();
+            } catch (err) {
+              console.error("Export failed:", err);
+            }
+          }}
           style={{
             backgroundColor: colors.orange,
             padding: 14,
