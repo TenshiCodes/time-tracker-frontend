@@ -125,7 +125,16 @@ export default function AdminDashboard() {
       >
         {/* USER */}
         <Text style={{ color: colors.subText, marginBottom: 5 }}>User</Text>
-        <View style={[inputStyle, { padding: 0 }]}>
+        <View
+          style={{
+            backgroundColor: colors.inputBg,
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 10,
+            marginBottom: 12,
+            overflow: "hidden",
+          }}
+        >
           <Picker
             selectedValue={filters.user_id}
             onValueChange={(v) =>
@@ -134,6 +143,8 @@ export default function AdminDashboard() {
             dropdownIconColor={colors.text}
             style={{
               color: colors.text,
+              height: 50,
+              paddingHorizontal: 10,
               backgroundColor:
                 Platform.OS === "web" ? colors.inputBg : "transparent",
             }}
@@ -151,7 +162,16 @@ export default function AdminDashboard() {
 
         {/* JOB */}
         <Text style={{ color: colors.subText, marginBottom: 5 }}>Job</Text>
-        <View style={[inputStyle, { padding: 0 }]}>
+        <View
+          style={{
+            backgroundColor: colors.inputBg,
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 10,
+            marginBottom: 12,
+            overflow: "hidden",
+          }}
+        >
           <Picker
             selectedValue={filters.job_code}
             onValueChange={(v) =>
@@ -160,6 +180,8 @@ export default function AdminDashboard() {
             dropdownIconColor={colors.text}
             style={{
               color: colors.text,
+              height: 50,
+              paddingHorizontal: 10,
               backgroundColor:
                 Platform.OS === "web" ? colors.inputBg : "transparent",
             }}
