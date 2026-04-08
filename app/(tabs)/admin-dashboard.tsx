@@ -110,9 +110,9 @@ export default function AdminDashboard() {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ padding: 20 }}
     >
-      <Text style={{ fontSize: 26, fontWeight: "600", color: colors.text }}>
-        Admin Dashboard
-      </Text>
+      <Text
+        style={{ fontSize: 26, fontWeight: "600", color: colors.text }}
+      ></Text>
 
       {/* FILTER CARD */}
       <View
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
             style={{
               color: colors.text,
               height: 50,
-              paddingHorizontal: 10,
+              paddingHorizontal: 7,
               backgroundColor:
                 Platform.OS === "web" ? colors.inputBg : "transparent",
             }}
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
             style={{
               color: colors.text,
               height: 50,
-              paddingHorizontal: 10,
+              paddingHorizontal: 7,
               backgroundColor:
                 Platform.OS === "web" ? colors.inputBg : "transparent",
             }}
