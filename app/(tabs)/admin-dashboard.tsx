@@ -33,8 +33,8 @@ export default function AdminDashboard() {
     subText: isDark ? "#aaa" : "#666",
     border: isDark ? "#2e2e2e" : "#ddd",
     inputBg: isDark ? "#2a2a2a" : "#fff",
-    green: "#07bdff",
-    orange: "#2aa82a",
+    green: "#2dbad9",
+    orange: "#34A853",
   };
 
   const [filters, setFilters] = useState({
@@ -236,7 +236,9 @@ export default function AdminDashboard() {
             borderRadius: 8,
           }}
         >
-          <Text style={{ color: "#fff", textAlign: "center" }}>Export CSV</Text>
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            Export Excel Report
+          </Text>
         </TouchableOpacity>
       </View>
 

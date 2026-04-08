@@ -217,32 +217,37 @@ export default function Settings() {
           }} 
         />
       </View>*/}
-      <TouchableOpacity
-        onPress={exportData}
-        style={{
-          backgroundColor: "#34A853",
-          padding: 15,
-          borderRadius: 10,
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>
-          Export Time Entries
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={emailExport}
-        style={{
-          backgroundColor: "#319db6",
-          padding: 15,
-          borderRadius: 10,
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>
-          Email Time Entries
-        </Text>
-      </TouchableOpacity>
+
+      {role !== "admin" && (
+        <>
+          <TouchableOpacity
+            onPress={exportData}
+            style={{
+              backgroundColor: "#34A853",
+              padding: 15,
+              borderRadius: 10,
+              marginTop: 20,
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Export Time Entries
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={emailExport}
+            style={{
+              backgroundColor: "#319db6",
+              padding: 15,
+              borderRadius: 10,
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Email Time Entries
+            </Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
