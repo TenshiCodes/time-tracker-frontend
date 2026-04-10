@@ -1,5 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
-import { useEffect, useState } from "react";
+import * as FileSystem from "expo-file-system/legacy";
+import { useFocusEffect, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
+import { useCallback, useEffect, useState } from "react";
 import {
   Platform,
   ScrollView,
@@ -10,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { API_BASE } from "../../config.js";
+
 type User = {
   id: number;
   first_name: string;
@@ -23,9 +28,11 @@ type Job = {
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
-
+  const [authorized, setAuthorized] = useState(false);
+  const [checking, setChecking] = useState(true);
   const colors = {
     background: isDark ? "#0f0f0f" : "#f5f5f5",
     card: isDark ? "#1c1c1c" : "#ffffff",
@@ -43,6 +50,12 @@ export default function AdminDashboard() {
     start_date: "",
     end_date: "",
   });
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [data, setData] = useState<any[]>([]);
+  const [totalSeconds, setTotalSeconds] = useState(0);
+
   const resetState = () => {
     setFilters({
       user_id: "",
@@ -50,18 +63,31 @@ export default function AdminDashboard() {
       start_date: "",
       end_date: "",
     });
-
     setData([]);
-    setTotalHours(0);
-  }; // ✅ THIS WAS MISSING
-  const [users, setUsers] = useState<User[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [data, setData] = useState<any[]>([]);
-  const [totalHours, setTotalHours] = useState(0);
-  const [totalSeconds, setTotalSeconds] = useState(0);
+    setTotalSeconds(0);
+  };
+  useFocusEffect(
+    useCallback(() => {
+      const checkUser = async () => {
+        setChecking(true);
 
+        const stored = await AsyncStorage.getItem("user");
+        const user = stored ? JSON.parse(stored) : null;
+
+        if (!user || user.role !== "admin") {
+          router.replace("/(tabs)");
+        } else {
+          setAuthorized(true);
+        }
+
+        setChecking(false);
+      };
+
+      checkUser();
+    }, []),
+  );
   useEffect(() => {
-    resetState(); // 🔥 clears old data
+    resetState();
     loadDropdowns();
     loadReport();
   }, []);
@@ -90,6 +116,66 @@ export default function AdminDashboard() {
     setTotalSeconds(result.total_seconds || 0);
   };
 
+  const formatHHMM = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return `${hrs}:${mins.toString().padStart(2, "0")}`;
+  };
+
+  // ✅ UNIVERSAL EXPORT FUNCTION
+  const handleExport = async () => {
+    try {
+      console.log("EXPORT CLICKED");
+
+      const params = {};
+      Object.entries(filters).forEach(([k, v]) => {
+        if (v) params[k] = v;
+      });
+
+      const query = new URLSearchParams(params).toString();
+      const url = `${API_BASE}/admin/export?${query}`;
+
+      console.log("DOWNLOAD URL:", url);
+
+      if (Platform.OS === "web") {
+        const res = await fetch(url);
+        console.log("WEB RESPONSE:", res.status);
+
+        const blob = await res.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = "admin_report.xlsx";
+        a.click();
+      } else {
+        console.log("STARTING DOWNLOAD...");
+
+        const fileUri = FileSystem.documentDirectory + "admin_report.xlsx";
+
+        const downloadRes = await FileSystem.downloadAsync(url, fileUri);
+
+        console.log("DOWNLOAD RESULT:", downloadRes);
+
+        const canShare = await Sharing.isAvailableAsync();
+        console.log("CAN SHARE:", canShare);
+
+        if (canShare) {
+          await Sharing.shareAsync(downloadRes.uri);
+        } else {
+          alert("Saved to: " + downloadRes.uri);
+        }
+      }
+    } catch (err) {
+      console.error("EXPORT FAILED FULL:", err);
+
+      alert(
+        "Export failed:\n" +
+          (err?.message || JSON.stringify(err) || "Unknown error"),
+      );
+    }
+  };
+
   const inputStyle = {
     backgroundColor: colors.inputBg,
     color: colors.text,
@@ -99,22 +185,14 @@ export default function AdminDashboard() {
     borderRadius: 8,
     marginBottom: 12,
   };
-  const formatHHMM = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-
-    return `${hrs}:${mins.toString().padStart(2, "0")}`;
-  };
+  if (checking || !authorized) {
+    return null; // or a loading spinner if you want
+  }
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ padding: 20 }}
     >
-      <Text
-        style={{ fontSize: 26, fontWeight: "600", color: colors.text }}
-      ></Text>
-
-      {/* FILTER CARD */}
       <View
         style={{
           backgroundColor: colors.card,
@@ -132,7 +210,6 @@ export default function AdminDashboard() {
             borderColor: colors.border,
             borderRadius: 10,
             marginBottom: 12,
-            overflow: "hidden",
           }}
         >
           <Picker
@@ -140,14 +217,7 @@ export default function AdminDashboard() {
             onValueChange={(v) =>
               setFilters({ ...filters, user_id: String(v) })
             }
-            dropdownIconColor={colors.text}
-            style={{
-              color: colors.text,
-              height: 50,
-              paddingHorizontal: 7,
-              backgroundColor:
-                Platform.OS === "web" ? colors.inputBg : "transparent",
-            }}
+            style={{ color: colors.text }}
           >
             <Picker.Item label="All Users" value="" />
             {users.map((u) => (
@@ -169,7 +239,6 @@ export default function AdminDashboard() {
             borderColor: colors.border,
             borderRadius: 10,
             marginBottom: 12,
-            overflow: "hidden",
           }}
         >
           <Picker
@@ -177,14 +246,7 @@ export default function AdminDashboard() {
             onValueChange={(v) =>
               setFilters({ ...filters, job_code: String(v) })
             }
-            dropdownIconColor={colors.text}
-            style={{
-              color: colors.text,
-              height: 50,
-              paddingHorizontal: 7,
-              backgroundColor:
-                Platform.OS === "web" ? colors.inputBg : "transparent",
-            }}
+            style={{ color: colors.text }}
           >
             <Picker.Item label="All Jobs" value="" />
             {jobs.map((j) => (
@@ -230,28 +292,7 @@ export default function AdminDashboard() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={async () => {
-            try {
-              const params: any = {};
-              Object.entries(filters).forEach(([k, v]) => {
-                if (v) params[k] = v;
-              });
-
-              const query = new URLSearchParams(params).toString();
-
-              const res = await fetch(`${API_BASE}/admin/export?${query}`);
-
-              const blob = await res.blob();
-              const url = window.URL.createObjectURL(blob);
-
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = "admin_report.xlsx";
-              a.click();
-            } catch (err) {
-              console.error("Export failed:", err);
-            }
-          }}
+          onPress={handleExport}
           style={{
             backgroundColor: colors.orange,
             padding: 14,
@@ -265,77 +306,29 @@ export default function AdminDashboard() {
       </View>
 
       {/* TOTAL */}
-      <Text
-        style={{
-          color: colors.green,
-          fontSize: 18,
-          marginTop: 15,
-          marginBottom: 10,
-        }}
-      >
+      <Text style={{ color: colors.green, fontSize: 18, marginTop: 15 }}>
         Total Hours: {formatHHMM(totalSeconds)}
       </Text>
 
-      {/* 📊 TABLE (EXCEL STYLE) */}
-      <View
-        style={{
-          backgroundColor: colors.card,
-          borderRadius: 10,
-          overflow: "hidden",
-        }}
-      >
-        {/* HEADER */}
-        <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: isDark ? "#2a2a2a" : "#eee",
-            padding: 12,
-          }}
-        >
-          <Text style={{ flex: 2, color: colors.text }}>Date</Text>
-          <Text style={{ flex: 1, color: colors.text }}>Hours</Text>
-          <Text style={{ flex: 2, color: colors.text }}>Job Code</Text>
-          <Text style={{ flex: 3, color: colors.text }}>Job Name</Text>
-        </View>
+      {/* TABLE */}
+      {data.map((row, i) => {
+        const start = new Date(row.clock_in);
+        const end = row.clock_out ? new Date(row.clock_out) : null;
 
-        {/* ROWS */}
-        {data.map((row, i) => {
-          const start = new Date(row.clock_in);
-          const end = row.clock_out ? new Date(row.clock_out) : null;
+        let hrs = "-";
+        if (end) {
+          const diffSeconds = (end.getTime() - start.getTime()) / 1000;
+          hrs = formatHHMM(diffSeconds);
+        }
 
-          let hrs = "-";
-          if (end) {
-            const diffSeconds = (end.getTime() - start.getTime()) / 1000;
-            hrs = formatHHMM(diffSeconds);
-          }
-
-          return (
-            <View
-              key={row.id}
-              style={{
-                flexDirection: "row",
-                padding: 12,
-                backgroundColor:
-                  i % 2 === 0 ? colors.card : isDark ? "#181818" : "#fafafa",
-              }}
-            >
-              <Text style={{ flex: 2, color: colors.text }}>
-                {start.toLocaleDateString()}
-              </Text>
-
-              <Text style={{ flex: 1, color: colors.text }}>{hrs}</Text>
-
-              <Text style={{ flex: 2, color: colors.green }}>
-                {row.job_code}
-              </Text>
-
-              <Text style={{ flex: 3, color: colors.subText }}>
-                {row.job_name || "-"}
-              </Text>
-            </View>
-          );
-        })}
-      </View>
+        return (
+          <View key={row.id} style={{ padding: 10 }}>
+            <Text style={{ color: colors.text }}>
+              {start.toLocaleDateString()} | {hrs} | {row.job_code}
+            </Text>
+          </View>
+        );
+      })}
     </ScrollView>
   );
 }

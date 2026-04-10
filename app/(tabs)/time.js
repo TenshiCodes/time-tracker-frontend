@@ -209,7 +209,6 @@ export default function Time() {
       },
       body: JSON.stringify({
         user_id: user.id,
-        item_id: job?.id ?? null,
         job_code: job?.code ?? null,
       }),
     });
@@ -303,7 +302,11 @@ export default function Time() {
               key={item.id}
               onPress={() => {
                 setJob(item);
-                setQuery(item.name);
+                setActiveJob({
+                  code: item.code,
+                  name: item.name,
+                });
+                setQuery(`${item.name} (${item.code})`);
                 setResults([]);
               }}
               style={{
@@ -421,7 +424,9 @@ export default function Time() {
                 </Text>
 
                 <Text style={{ color: "#4caf50" }}>
-                  {entry.job_code || "No Job"}
+                  {entry.job_name
+                    ? `${entry.job_name} (${entry.job_code})`
+                    : entry.job_code || "No Job"}
                 </Text>
 
                 <Text style={{ color: "#888", fontSize: 12 }}>
