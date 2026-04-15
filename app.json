@@ -3,11 +3,14 @@
     "name": "PBE Time App",
     "slug": "cleanApp",
     "version": "1.0.0",
-    "orientation": "portrait",
+
     "icon": "./assets/images/pbe_small.png",
-    "scheme": "cleanapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/pbe_favicon_2.png"
+    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.pacificblueengineering.timeapp",
@@ -15,6 +18,7 @@
         "ITSAppUsesNonExemptEncryption": false
       }
     },
+
     "android": {
       "package": "com.tenshicodes.cleanapp",
       "adaptiveIcon": {
@@ -24,6 +28,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
+
     "splash": {
       "image": "./assets/images/pbe_large.png",
       "resizeMode": "contain",
@@ -33,50 +38,19 @@
         "backgroundColor": "#000000"
       }
     },
+
     "extra": {
       "eas": {
         "projectId": "399ca44d-63ac-493c-a3fc-2addc45846fb"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+
     "updates": {
       "url": "https://u.expo.dev/399ca44d-63ac-493c-a3fc-2addc45846fb"
+    },
+
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
-  },
-  "web": {
-    "output": "static",
-    "favicon": "./assets/images/pbe_favicon_2.png"
-  },
-  "plugins": [
-    "expo-router",
-    "@react-native-community/datetimepicker",
-    [
-      "expo-splash-screen",
-      {
-        "image": "./assets/images/pbe_large.png",
-        "imageWidth": 170,
-        "resizeMode": "contain",
-        "backgroundColor": "#000000"
-      }
-    ]
-  ],
-  "experiments": {
-    "typedRoutes": true,
-    "reactCompiler": true
-  },
-  "runtimeVersion": {
-    "policy": "appVersion"
-  },
-  "updates": {
-    "url": "https://u.expo.dev/399ca44d-63ac-493c-a3fc-2addc45846fb"
-  },
-  "extra": {
-    "router": {},
-    "eas": {
-      "projectId": "399ca44d-63ac-493c-a3fc-2addc45846fb"
-    }
-  },
-  "owner": "tenshicodes"
+  }
 }
