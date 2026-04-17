@@ -213,23 +213,47 @@ export default function AdminDashboard() {
             overflow: "hidden",
           }}
         >
-          <Picker
-            selectedValue={filters.user_id}
-            onValueChange={(v) =>
-              setFilters({ ...filters, user_id: String(v) })
-            }
-            style={{ color: colors.text, backgroundColor: "transparent" }}
-            dropdownIconColor={colors.text}
-          >
-            <Picker.Item label="All Users" value="" />
-            {users.map((u) => (
-              <Picker.Item
-                key={u.id}
-                label={`${u.first_name} ${u.last_name}`}
-                value={u.id}
-              />
-            ))}
-          </Picker>
+          {Platform.OS === "web" ? (
+            <select
+              value={filters.user_id}
+              onChange={(e) =>
+                setFilters({ ...filters, user_id: e.target.value })
+              }
+              style={{
+                width: "100%",
+                padding: 12,
+                borderRadius: 10,
+                backgroundColor: colors.inputBg,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <option value="">All Users</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.first_name} {u.last_name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <Picker
+              selectedValue={filters.user_id}
+              onValueChange={(v) =>
+                setFilters({ ...filters, user_id: String(v) })
+              }
+              style={{ color: colors.text }}
+              dropdownIconColor={colors.text}
+            >
+              <Picker.Item label="All Users" value="" />
+              {users.map((u) => (
+                <Picker.Item
+                  key={u.id}
+                  label={`${u.first_name} ${u.last_name}`}
+                  value={u.id}
+                />
+              ))}
+            </Picker>
+          )}
         </View>
 
         {/* JOB */}
