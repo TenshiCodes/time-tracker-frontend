@@ -267,22 +267,47 @@ export default function AdminDashboard() {
             marginBottom: 12,
           }}
         >
-          <Picker
-            selectedValue={filters.job_code}
-            onValueChange={(v) =>
-              setFilters({ ...filters, job_code: String(v) })
-            }
-            style={{ color: colors.text }}
-          >
-            <Picker.Item label="All Jobs" value="" />
-            {jobs.map((j) => (
-              <Picker.Item
-                key={j.id}
-                label={`${j.code} - ${j.name}`}
-                value={j.code}
-              />
-            ))}
-          </Picker>
+          {Platform.OS === "web" ? (
+            <select
+              value={filters.job_code}
+              onChange={(e) =>
+                setFilters({ ...filters, job_code: e.target.value })
+              }
+              style={{
+                width: "100%",
+                padding: 12,
+                borderRadius: 10,
+                backgroundColor: colors.inputBg,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <option value="">All Jobs</option>
+              {jobs.map((j) => (
+                <option key={j.id} value={j.code}>
+                  {j.code} - {j.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <Picker
+              selectedValue={filters.job_code}
+              onValueChange={(v) =>
+                setFilters({ ...filters, job_code: String(v) })
+              }
+              style={{ color: colors.text }}
+              dropdownIconColor={colors.text}
+            >
+              <Picker.Item label="All Jobs" value="" />
+              {jobs.map((j) => (
+                <Picker.Item
+                  key={j.id}
+                  label={`${j.code} - ${j.name}`}
+                  value={j.code}
+                />
+              ))}
+            </Picker>
+          )}
         </View>
 
         {/* DATES */}
