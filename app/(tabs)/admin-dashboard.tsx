@@ -210,6 +210,7 @@ export default function AdminDashboard() {
             borderColor: colors.border,
             borderRadius: 10,
             marginBottom: 12,
+            overflow: "hidden",
           }}
         >
           <Picker
@@ -217,7 +218,8 @@ export default function AdminDashboard() {
             onValueChange={(v) =>
               setFilters({ ...filters, user_id: String(v) })
             }
-            style={{ color: colors.text }}
+            style={{ color: colors.text, backgroundColor: "transparent" }}
+            dropdownIconColor={colors.text}
           >
             <Picker.Item label="All Users" value="" />
             {users.map((u) => (
