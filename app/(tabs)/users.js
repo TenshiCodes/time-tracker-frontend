@@ -182,29 +182,7 @@ export default function Users() {
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [assignedJobs, setAssignedJobs] = useState(new Set());
-  const openJobModal = (user) => {
-    setSelectedUser(user);
-    setModalVisible(true);
-  try {
-    // get all jobs
-    const jobsRes = await fetch(`${API_BASE}/admin/jobs`);
-    const jobsData = await jobsRes.json();
-    setJobs(jobsData);
-
-    // get assigned jobs
-    const assignedRes = await fetch(
-      `${API_BASE}/admin/user/${user.id}/jobs`
-    );
-    const assignedData = await assignedRes.json();
-
-    // store as Set for fast toggle
-    setAssignedJobs(new Set(assignedData.map(j => j.id)));
-
-  } catch (err) {
-    console.error("JOB LOAD ERROR:", err);
-  }
-}
-};
+  
   const closeJobModal = () => {
     setModalVisible(false);
     setSelectedUser(null);
