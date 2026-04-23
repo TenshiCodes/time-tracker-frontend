@@ -241,7 +241,7 @@ export default function Users() {
               onPress={() => openJobModal(item)}
               style={{
                 marginTop: 10,
-                backgroundColor: "#9C27B0",
+                backgroundColor: "#4caf4fd3",
                 padding: 10,
                 borderRadius: 8,
               }}

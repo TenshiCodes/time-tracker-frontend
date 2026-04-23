@@ -81,7 +81,7 @@ export default function Index() {
   };
 
   const handleSelect = (item: any) => {
-    setQuery(item.name);
+    setQuery(item.job_name);
     setSelectedItem(item);
     setResults([]);
   };
@@ -113,7 +113,7 @@ export default function Index() {
                 color: isDark ? "#4CAF50" : "#2e7d32",
               }}
             >
-              {selectedItem.code}
+              {selectedItem.job_code}
             </Text>
           )}
 
@@ -129,7 +129,7 @@ export default function Index() {
                     onPress={() => handleSelect(item)}
                     style={styles.item}
                   >
-                    {highlightText(item.name, query)}
+                    {highlightText(item.job_name, query)}
                   </TouchableOpacity>
                 )}
               />
@@ -161,7 +161,7 @@ export default function Index() {
                 color: isDark ? "#4CAF50" : "#2e7d32",
               }}
             >
-              {selectedItem.code}
+              {selectedItem.job_code}
             </Text>
           )}
 
@@ -177,7 +177,7 @@ export default function Index() {
                     onPress={() => handleSelect(item)}
                     style={styles.item}
                   >
-                    {highlightText(item.name, query)}
+                    {highlightText(item.job_name, query)}
                   </TouchableOpacity>
                 )}
               />
