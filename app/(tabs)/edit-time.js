@@ -457,8 +457,6 @@ export default function EditTime() {
             Clear Job
           </Text>
         </TouchableOpacity>
-      </>
-    )}
       
       {Array.isArray(results) &&
         results.length > 0 &&
