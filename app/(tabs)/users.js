@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Modal, ScrollView } from "react-native";
 import {
   Alert,
   FlatList,
@@ -14,7 +15,10 @@ export default function Users() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
-  const [users, setUsers] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [selectedJobs, setSelectedJobs] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -45,7 +49,77 @@ export default function Users() {
       console.error("ROLE ERROR:", err);
     }
   };
+  const openJobModal = async (user) => {
+    try {
+      setSelectedUser(user);
 
+      const jobsRes = await fetch(`${API_BASE}/admin/jobs`);
+      const allJobs = await jobsRes.json();
+
+      const userRes = await fetch(`${API_BASE}/admin/users/${user.id}/jobs`);
+      const assigned = await userRes.json();
+
+      setJobs(allJobs);
+      setSelectedJobs(assigned.map(j => j.id));
+      setShowModal(true);
+
+    } catch (err) {
+      console.error("JOB LOAD ERROR:", err);
+    }
+  };
+  const toggleJob = (jobId) => {
+    setAssignedJobs(prev => {
+      const updated = new Set(prev);
+
+      if (updated.has(jobId)) {
+        updated.delete(jobId);
+      } else {
+        updated.add(jobId);
+      }
+
+      return updated;
+    });
+  };
+  const saveAssignments = async () => {
+    try {
+      await fetch(`${API_BASE}/admin/assign-jobs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: selectedUser.id,
+          job_ids: Array.from(assignedJobs),
+        }),
+      });
+
+      alert("Assignments saved");
+      setModalVisible(false);
+
+    } catch (err) {
+      console.error("SAVE ERROR:", err);
+    }
+  };
+  const saveJobs = async () => {
+    try {
+      await fetch(`${API_BASE}/admin/users/${selectedUser.id}/jobs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ item_ids: selectedJobs }),
+      });
+
+      setShowModal(false);
+
+      if (Platform.OS === "web") {
+        window.alert("Jobs updated");
+      } else {
+        Alert.alert("Success", "Jobs updated");
+      }
+
+    } catch (err) {
+      console.error("SAVE ERROR:", err);
+    }
+  };
   // 🔥 CONFIRM DELETE (WEB + MOBILE)
   const confirmDeleteUser = (userId) => {
     if (Platform.OS === "web") {
@@ -106,75 +180,211 @@ export default function Users() {
       Alert.alert("Error", "Something broke");
     }
   };
+  const [modalVisible, setModalVisible] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  const [assignedJobs, setAssignedJobs] = useState(new Set());
+  const openJobModal = (user) => {
+    setSelectedUser(user);
+    setModalVisible(true);
+  try {
+    // get all jobs
+    const jobsRes = await fetch(`${API_BASE}/admin/jobs`);
+    const jobsData = await jobsRes.json();
+    setJobs(jobsData);
 
+    // get assigned jobs
+    const assignedRes = await fetch(
+      `${API_BASE}/admin/user/${user.id}/jobs`
+    );
+    const assignedData = await assignedRes.json();
+
+    // store as Set for fast toggle
+    setAssignedJobs(new Set(assignedData.map(j => j.id)));
+
+  } catch (err) {
+    console.error("JOB LOAD ERROR:", err);
+  }
+}
+};
+  const closeJobModal = () => {
+    setModalVisible(false);
+    setSelectedUser(null);
+  };
   return (
-    <View
+  <View
+    style={{
+      flex: 1,
+      padding: 20,
+      backgroundColor: isDark ? "#121212" : "#f2f2f2",
+    }}
+  >
+    <Text
       style={{
-        flex: 1,
-        padding: 20,
-        backgroundColor: isDark ? "#121212" : "#f2f2f2",
+        fontSize: 24,
+        marginBottom: 20,
+        color: isDark ? "#fff" : "#000",
       }}
     >
-      <Text
-        style={{
-          fontSize: 24,
-          marginBottom: 20,
-          color: isDark ? "#fff" : "#000",
-        }}
-      >
-        Users
-      </Text>
+      Users
+    </Text>
 
-      <FlatList
-        data={users}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View
+    <FlatList
+      data={users}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View
+          style={{
+            padding: 15,
+            marginBottom: 10,
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            borderRadius: 10,
+          }}
+        >
+          <Text style={{ color: isDark ? "#fff" : "#000" }}>
+            {item.first_name} {item.last_name}
+          </Text>
+
+          <Text style={{ color: "#888" }}>{item.email}</Text>
+
+          <Text style={{ color: "#4CAF50" }}>Role: {item.role}</Text>
+
+          {/* 🔄 TOGGLE ROLE */}
+          <TouchableOpacity
+            onPress={() => toggleRole(item)}
             style={{
-              padding: 15,
-              marginBottom: 10,
-              backgroundColor: isDark ? "#1e1e1e" : "#fff",
-              borderRadius: 10,
+              marginTop: 10,
+              backgroundColor: "#2196F3",
+              padding: 10,
+              borderRadius: 8,
             }}
           >
-            <Text style={{ color: isDark ? "#fff" : "#000" }}>
-              {item.first_name} {item.last_name}
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Toggle Role
             </Text>
+          </TouchableOpacity>
 
-            <Text style={{ color: "#888" }}>{item.email}</Text>
+          {/* 🧠 ASSIGN JOBS */}
+          <TouchableOpacity
+            onPress={() => openJobModal(item)}
+            style={{
+              marginTop: 10,
+              backgroundColor: "#9C27B0",
+              padding: 10,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Assign Jobs
+            </Text>
+          </TouchableOpacity>
 
-            <Text style={{ color: "#4CAF50" }}>Role: {item.role}</Text>
+          {/* 🗑 DELETE */}
+          <TouchableOpacity
+            onPress={() => confirmDeleteUser(item.id)}
+            style={{
+              marginTop: 10,
+              backgroundColor: "#f44336",
+              padding: 10,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Delete
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    />
 
-            {/* 🔄 TOGGLE ROLE */}
-            <TouchableOpacity
-              onPress={() => toggleRole(item)}
-              style={{
-                marginTop: 10,
-                backgroundColor: "#2196F3",
-                padding: 10,
-                borderRadius: 8,
-              }}
-            >
-              <Text style={{ color: "#fff", textAlign: "center" }}>
-                Toggle Role
-              </Text>
-            </TouchableOpacity>
+    {/* 🔥 MODAL */}
+    <Modal visible={modalVisible} animationType="slide" transparent={true}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }}
+      >
+        <View
+          style={{
+            width: "90%",
+            maxHeight: "80%",
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            borderRadius: 12,
+            padding: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              marginBottom: 10,
+              color: isDark ? "#fff" : "#000",
+            }}
+          >
+            Assign Jobs to {selectedUser?.first_name}
+          </Text>
 
-            {/* 🗑 DELETE */}
-            <TouchableOpacity
-              onPress={() => confirmDeleteUser(item.id)}
-              style={{
-                marginTop: 10,
-                backgroundColor: "#f44336",
-                padding: 10,
-                borderRadius: 8,
-              }}
-            >
-              <Text style={{ color: "#fff", textAlign: "center" }}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-    </View>
-  );
-}
+          {/* 🔥 JOB LIST */}
+          <ScrollView>
+            {jobs.map((job) => {
+              const isSelected = assignedJobs.has(job.id);
+
+              return (
+                <TouchableOpacity
+                  key={job.id}
+                  onPress={() => toggleJob(job.id)}
+                  style={{
+                    padding: 12,
+                    marginBottom: 8,
+                    borderRadius: 8,
+                    backgroundColor: isSelected
+                      ? "#4CAF50"
+                      : isDark
+                      ? "#333"
+                      : "#ddd",
+                  }}
+                >
+                  <Text style={{ color: isSelected ? "#fff" : isDark ? "#fff" : "#000" }}>
+                    {isSelected ? "✓ " : ""}
+                    {job.code} - {job.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* 💾 SAVE */}
+          <TouchableOpacity
+            onPress={saveAssignments}
+            style={{
+              marginTop: 10,
+              backgroundColor: "#4CAF50",
+              padding: 12,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              Save Assignments
+            </Text>
+          </TouchableOpacity>
+
+          {/* CLOSE */}
+          <TouchableOpacity
+            onPress={closeJobModal}
+            style={{
+              marginTop: 10,
+              backgroundColor: "#999",
+              padding: 10,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ textAlign: "center", color: "#fff" }}>
+              Close
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  </View>
+);

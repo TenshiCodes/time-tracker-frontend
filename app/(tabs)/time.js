@@ -49,6 +49,7 @@ export default function Time() {
         setClockInTime(time);
 
         setActiveJob({
+          id: data.item_id, // if you add it later from backend
           code: data.job_code,
           name: data.job_name,
         });
@@ -191,7 +192,9 @@ export default function Time() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/search?q=${text}`);
+    const res = await fetch(
+      `${API_BASE}/search?q=${text}&user_id=${user?.id}`
+    );
     const data = await res.json();
 
     setResults(data.slice(0, 3));
@@ -209,7 +212,7 @@ export default function Time() {
       },
       body: JSON.stringify({
         user_id: user.id,
-        job_code: job?.code ?? null,
+        item_id: job?.id ?? null,
       }),
     });
 
@@ -303,8 +306,8 @@ export default function Time() {
               onPress={() => {
                 setJob(item);
                 setActiveJob({
-                  code: item.code,
-                  name: item.name,
+                  code: data.job_code,
+                  name: data.job_name,
                 });
                 setQuery(`${item.name} (${item.code})`);
                 setResults([]);

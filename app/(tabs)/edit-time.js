@@ -45,7 +45,11 @@ export default function EditTime() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/search?q=${text}`);
+    if (!entry?.user_id) return;
+
+      const res = await fetch(
+        `${API_BASE}/search?q=${text}&user_id=${entry.user_id}`
+      );
     const data = await res.json();
 
     setResults(data.slice(0, 3));
@@ -422,6 +426,34 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       />
+      {entry?.job_code && (
+      <>
+        <Text style={{ color: "#4caf50", marginBottom: 10 }}>
+          Selected: {entry.job_code}
+        </Text>
+
+        <TouchableOpacity
+          onPress={() =>
+            setEntry({
+              ...entry,
+              job_code: null,
+              item_id: null,
+            })
+          }
+          style={{
+            backgroundColor: "#999",
+            padding: 8,
+            borderRadius: 6,
+            marginBottom: 10,
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            Clear Job
+          </Text>
+        </TouchableOpacity>
+      </>
+    )}
+      
       {Array.isArray(results) &&
         results.length > 0 &&
         results.map((item, index) => {
