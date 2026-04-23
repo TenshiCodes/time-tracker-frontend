@@ -93,14 +93,13 @@ export default function Users() {
   // 💾 SAVE ASSIGNMENTS
   const saveAssignments = async () => {
     try {
-      await fetch(`${API_BASE}/admin/assign-jobs`, {
+      await fetch(`${API_BASE}/admin/users/${selectedUser.id}/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: selectedUser.id,
-          job_ids: Array.from(assignedJobs),
+          item_ids: Array.from(assignedJobs), // ✅ MUST MATCH BACKEND
         }),
       });
 
@@ -304,8 +303,8 @@ export default function Users() {
                 jobs.map((job) => {
                   const isSelected = assignedJobs.has(job.id);
 
-                  const code = job.code || job.job_code || "";
-                  const name = job.name || job.job_name || "Unnamed Job";
+                  const code = job.job_code;
+                  const name = job.job_name;
 
                   return (
                     <TouchableOpacity
