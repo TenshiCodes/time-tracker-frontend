@@ -488,9 +488,9 @@ export default function EditTime() {
               }}
             >
               <Text style={{ color: isDark ? "#fff" : "#000" }}>
-                {item.name || "No Name"}
+                {item.job_name || "No Name"}
               </Text>
-              <Text style={{ color: "#888" }}>{item.code || "No Code"}</Text>
+              <Text style={{ color: "#888" }}>{item.job_code || "No Code"}</Text>
             </TouchableOpacity>
           );
         })}
