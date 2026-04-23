@@ -17,11 +17,9 @@ export default function EditTime() {
 
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
-
-  const [entry, setEntry] = useState(null);
-
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [entry, setEntry] = useState(null);
 
   const [startDateObj, setStartDateObj] = useState(null);
   const [endDateObj, setEndDateObj] = useState(null);
@@ -39,10 +37,32 @@ export default function EditTime() {
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
+  const searchJobs = async (text) => {
+    setQuery(text);
 
+    if (!text) {
+      setResults([]);
+      return;
+    }
+
+    if (!entry?.user_id) return;
+
+      const res = await fetch(
+        `${API_BASE}/search?q=${text}&user_id=${entry.user_id}`
+      );
+    const data = await res.json();
+
+    setResults(data.slice(0, 3));
+  };
   const parseUTC = (str) => {
     if (!str) return null;
-    return new Date(str.replace(" ", "T"));
+
+    // normalize space → T (safe)
+    const normalized = str.replace(" ", "T");
+
+    const d = new Date(normalized);
+
+    return d;
   };
 
   const loadEntry = async () => {
@@ -50,60 +70,49 @@ export default function EditTime() {
     const data = await res.json();
 
     setEntry(data);
+    // 🔍 SEARCH JOBS
 
-    // START
+    // ✅ START DATE
     if (data.clock_in) {
-      const d = parseUTC(data.clock_in);
-      setStartDateObj(d);
+      const local = parseUTC(data.clock_in);
 
-      setDate(d.toLocaleDateString("en-CA"));
-      setStartTime(
-        `${d.getHours().toString().padStart(2, "0")}:${d
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`
-      );
+      setStartDateObj(local);
+
+      const d = local.toLocaleDateString("en-CA");
+      setDate(d);
+
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
+
+      setStartTime(`${h}:${m}`);
     }
 
-    // END
+    // ✅ END DATE
     if (data.clock_out) {
-      const d = parseUTC(data.clock_out);
-      setEndDateObj(d);
+      const local = parseUTC(data.clock_out);
 
-      setEndDate(d.toLocaleDateString("en-CA"));
-      setEndTime(
-        `${d.getHours().toString().padStart(2, "0")}:${d
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`
-      );
+      setEndDateObj(local);
+
+      const d = local.toLocaleDateString("en-CA");
+      setEndDate(d);
+
+      const h = local.getHours().toString().padStart(2, "0");
+      const m = local.getMinutes().toString().padStart(2, "0");
+
+      setEndTime(`${h}:${m}`);
     }
   };
 
-  // 🔍 SEARCH JOBS (FIXED)
-  const searchJobs = async (text) => {
-    setQuery(text);
-
-    if (!text || !entry?.user_id) {
-      setResults([]);
-      return;
-    }
-
-    const res = await fetch(
-      `${API_BASE}/search?q=${text}&user_id=${entry.user_id}`
-    );
-    const data = await res.json();
-
-    setResults(data.slice(0, 3));
-  };
-
+  // 💾 SAVE
   const formatForSQL = (dateStr, timeStr) => {
     if (!dateStr || !timeStr) return null;
 
     const [y, mo, d] = dateStr.split("-");
     const [h, m] = timeStr.split(":");
 
-    return new Date(y, mo - 1, d, h, m).toISOString();
+    const local = new Date(y, mo - 1, d, h, m);
+
+    return local.toISOString();
   };
 
   const saveChanges = async () => {
@@ -113,7 +122,6 @@ export default function EditTime() {
       clock_in: formatForSQL(date, startTime),
       clock_out: formatForSQL(endDate || date, endTime),
     };
-
     await fetch(`${API_BASE}/time/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -126,67 +134,285 @@ export default function EditTime() {
   if (!entry) return null;
 
   return (
-    <View style={{ flex: 1, padding: 20, backgroundColor: isDark ? "#121212" : "#f2f2f2" }}>
-      <Text style={{ fontSize: 22, marginBottom: 20, color: isDark ? "#fff" : "#000" }}>
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        backgroundColor: isDark ? "#121212" : "#f2f2f2",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 22,
+          marginBottom: 20,
+          color: isDark ? "#fff" : "#000",
+        }}
+      >
         Edit Time Entry
       </Text>
+      {/* 📅 START DATE */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowDate(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              Start Date: {date || "Select Date"}
+            </Text>
+          </TouchableOpacity>
 
-      {/* START DATE */}
-      <TouchableOpacity onPress={() => setShowDate(true)} style={{ padding: 15 }}>
-        <Text style={{ color: isDark ? "#fff" : "#000" }}>
-          Start Date: {date}
-        </Text>
-      </TouchableOpacity>
+          {showDate && (
+            <DateTimePicker
+              value={startDateObj || new Date()}
+              mode="date"
+              onChange={(e, selected) => {
+                setShowDate(false);
+                if (selected && startDateObj) {
+                  // 🔥 MERGE date into existing Date
+                  const updated = new Date(startDateObj);
+                  updated.setFullYear(selected.getFullYear());
+                  updated.setMonth(selected.getMonth());
+                  updated.setDate(selected.getDate());
 
-      {showDate && (
-        <DateTimePicker
-          value={startDateObj || new Date()}
-          mode="date"
-          onChange={(e, selected) => {
-            setShowDate(false);
-            if (!selected) return;
+                  setStartDateObj(updated);
 
-            const updated = new Date(startDateObj || new Date());
-            updated.setFullYear(selected.getFullYear());
-            updated.setMonth(selected.getMonth());
-            updated.setDate(selected.getDate());
+                  const d = updated.toLocaleDateString("en-CA");
+                  setDate(d);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="YYYY-MM-DD"
+          value={date}
+          onChangeText={(text) => {
+            setDate(text);
+
+            if (!startDateObj || !text.includes("-")) return;
+
+            const [y, m, d] = text.split("-");
+
+            const updated = new Date(startDateObj);
+            updated.setFullYear(Number(y));
+            updated.setMonth(Number(m) - 1);
+            updated.setDate(Number(d));
 
             setStartDateObj(updated);
-            setDate(updated.toLocaleDateString("en-CA"));
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
           }}
         />
       )}
+      {/* ⏱ START TIME */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowStart(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              Start: {startTime || "Select Time"}
+            </Text>
+          </TouchableOpacity>
 
-      {/* START TIME */}
-      <TouchableOpacity onPress={() => setShowStart(true)} style={{ padding: 15 }}>
-        <Text style={{ color: isDark ? "#fff" : "#000" }}>
-          Start: {startTime}
-        </Text>
-      </TouchableOpacity>
+          {showStart && (
+            <DateTimePicker
+              value={startDateObj || new Date()}
+              mode="time"
+              onChange={(e, selected) => {
+                setShowStart(false);
+                if (selected && startDateObj) {
+                  // 🔥 MERGE time into existing date
+                  const updated = new Date(startDateObj);
+                  updated.setHours(selected.getHours());
+                  updated.setMinutes(selected.getMinutes());
 
-      {showStart && (
-        <DateTimePicker
-          value={startDateObj || new Date()}
-          mode="time"
-          onChange={(e, selected) => {
-            setShowStart(false);
-            if (!selected) return;
+                  setStartDateObj(updated);
 
-            const updated = new Date(startDateObj || new Date());
-            updated.setHours(selected.getHours());
-            updated.setMinutes(selected.getMinutes());
+                  const h = updated.getHours().toString().padStart(2, "0");
+                  const m = updated.getMinutes().toString().padStart(2, "0");
+
+                  setStartTime(`${h}:${m}`);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="Start (HH:MM)"
+          value={startTime}
+          onChangeText={(text) => {
+            setStartTime(text);
+
+            if (!text.includes(":") || !startDateObj) return;
+
+            const [h, m] = text.split(":");
+
+            const updated = new Date(startDateObj);
+            updated.setHours(Number(h));
+            updated.setMinutes(Number(m));
 
             setStartDateObj(updated);
-            setStartTime(
-              `${updated.getHours().toString().padStart(2, "0")}:${updated
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`
-            );
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
           }}
         />
       )}
+      {/* 📅 END DATE */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowEndDate(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              End Date: {endDate || "Select Date"}
+            </Text>
+          </TouchableOpacity>
 
+          {showEndDate && (
+            <DateTimePicker
+              value={endDateObj || new Date()}
+              mode="date"
+              onChange={(e, selected) => {
+                setShowEndDate(false);
+                if (selected && endDateObj) {
+                  const updated = new Date(endDateObj);
+                  updated.setFullYear(selected.getFullYear());
+                  updated.setMonth(selected.getMonth());
+                  updated.setDate(selected.getDate());
+
+                  setEndDateObj(updated);
+
+                  const d = updated.toLocaleDateString("en-CA");
+                  setEndDate(d);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="YYYY-MM-DD"
+          value={endDate}
+          onChangeText={(text) => {
+            setEndDate(text);
+
+            if (!endDateObj || !text.includes("-")) return;
+
+            const [y, m, d] = text.split("-");
+
+            const updated = new Date(endDateObj);
+            updated.setFullYear(Number(y));
+            updated.setMonth(Number(m) - 1);
+            updated.setDate(Number(d));
+
+            setEndDateObj(updated);
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+        />
+      )}
+      {/* ⏱ END TIME */}
+      {Platform.OS !== "web" ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setShowEnd(true)}
+            style={{
+              backgroundColor: isDark ? "#1e1e1e" : "#fff",
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 20,
+            }}
+          >
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>
+              End: {endTime || "Select Time"}
+            </Text>
+          </TouchableOpacity>
+
+          {showEnd && (
+            <DateTimePicker
+              value={endDateObj || new Date()}
+              mode="time"
+              onChange={(e, selected) => {
+                setShowEnd(false);
+                if (selected && endDateObj) {
+                  // 🔥 MERGE time into existing date
+                  const updated = new Date(endDateObj);
+                  updated.setHours(selected.getHours());
+                  updated.setMinutes(selected.getMinutes());
+
+                  setEndDateObj(updated);
+
+                  const h = updated.getHours().toString().padStart(2, "0");
+                  const m = updated.getMinutes().toString().padStart(2, "0");
+
+                  setEndTime(`${h}:${m}`);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <TextInput
+          placeholder="End (HH:MM)"
+          value={endTime}
+          onChangeText={(text) => {
+            setEndTime(text);
+
+            if (!text.includes(":") || !endDateObj) return;
+
+            const [h, m] = text.split(":");
+
+            const updated = new Date(endDateObj);
+            updated.setHours(Number(h));
+            updated.setMinutes(Number(m));
+
+            setEndDateObj(updated);
+          }}
+          style={{
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#000",
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 20,
+          }}
+        />
+      )}
       {/* 🔍 JOB SEARCH */}
       <TextInput
         placeholder="Search Job..."
@@ -200,43 +426,83 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       />
-
-      {/* CURRENT JOB */}
       {entry?.job_code && (
+      <>
         <Text style={{ color: "#4caf50", marginBottom: 10 }}>
-          {entry.job_name} ({entry.job_code})
+          Selected: {entry.job_name
+            ? `${entry.job_name} (${entry.job_code})`
+            : entry.job_code}
         </Text>
-      )}
 
-      {/* RESULTS (FIXED FIELD NAMES) */}
-      {results.map((item) => (
         <TouchableOpacity
-          key={item.id}
           onPress={() => {
+            const normalized = {
+              job_code: item.job_code ?? item.code ?? "",
+              job_name: item.job_name ?? item.name ?? "",
+              item_id: item.id ?? null,
+            };
+
             setEntry({
-              ...entry,
-              job_code: item.job_code,
-              job_name: item.job_name,
-              item_id: item.id,
+              ...(entry || {}),
+              ...normalized,
             });
 
-            setQuery(`${item.job_name} (${item.job_code})`);
+            setQuery(
+              `${normalized.job_name} (${normalized.job_code})`,
+            );
+
             setResults([]);
           }}
           style={{
-            padding: 10,
-            backgroundColor: isDark ? "#2a2a2a" : "#ddd",
-            marginBottom: 5,
+            backgroundColor: "#999",
+            padding: 8,
             borderRadius: 6,
+            marginBottom: 10,
           }}
         >
-          <Text style={{ color: isDark ? "#fff" : "#000" }}>
-            {item.job_name}
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            Clear Job
           </Text>
-          <Text style={{ color: "#888" }}>{item.job_code}</Text>
         </TouchableOpacity>
-      ))}
+      </>
+    )}
+      
+      {Array.isArray(results) &&
+        results.length > 0 &&
+        results.map((item, index) => {
+          if (!item) return null;
 
+          return (
+            <TouchableOpacity
+              key={item.id ?? index}
+              onPress={() => {
+                setEntry({
+                  ...(entry || {}),
+                  job_code: null,
+                  job_name: null,
+                  item_id: null,
+                })
+
+                setQuery(
+                  `${item.name || "Unknown"} (${item.code || "No Code"})`,
+                );
+
+                setResults([]);
+              }}
+              style={{
+                padding: 10,
+                backgroundColor: isDark ? "#2a2a2a" : "#ddd",
+                marginBottom: 5,
+                borderRadius: 6,
+              }}
+            >
+              <Text style={{ color: isDark ? "#fff" : "#000" }}>
+                {item.name || "No Name"}
+              </Text>
+              <Text style={{ color: "#888" }}>{item.code || "No Code"}</Text>
+            </TouchableOpacity>
+          );
+        })}
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
@@ -244,12 +510,9 @@ export default function EditTime() {
           backgroundColor: "#4CAF50",
           padding: 15,
           borderRadius: 10,
-          marginTop: 20,
         }}
       >
-        <Text style={{ color: "#fff", textAlign: "center" }}>
-          Save Changes
-        </Text>
+        <Text style={{ color: "#fff", textAlign: "center" }}>Save Changes</Text>
       </TouchableOpacity>
     </View>
   );
