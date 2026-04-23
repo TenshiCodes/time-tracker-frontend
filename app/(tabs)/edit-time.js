@@ -474,3 +474,4 @@ export default function EditTime() {
       </TouchableOpacity>
     </View>
   );
+}
