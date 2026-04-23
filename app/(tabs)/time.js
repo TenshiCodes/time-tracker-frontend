@@ -181,8 +181,6 @@ export default function Time() {
     const res = await fetch(`${API_BASE}/time/${userId}`);
     const data = await res.json();
 
-    console.log("ENTRIES:", data); // 👈 ADD THIS
-
     setEntries(data);
   };
 
