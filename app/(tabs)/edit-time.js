@@ -426,13 +426,6 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       />
-      {entry?.job_code && (
-      <>
-        <Text style={{ color: "#4caf50", marginBottom: 10 }}>
-          Selected: {entry.job_name
-            ? `${entry.job_name} (${entry.job_code})`
-            : entry.job_code}
-        </Text>
 
         <TouchableOpacity
           onPress={() => {
@@ -484,7 +477,7 @@ export default function EditTime() {
                 })
 
                 setQuery(
-                  `${item.name || "Unknown"} (${item.code || "No Code"})`,
+                  `${item.job_name || "Unknown"} (${item.job_code || "No Code"})`,
                 );
 
                 setResults([]);
