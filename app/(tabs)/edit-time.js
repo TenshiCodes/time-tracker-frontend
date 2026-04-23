@@ -45,11 +45,7 @@ export default function EditTime() {
       return;
     }
 
-    if (!entry?.user_id) return;
-
-      const res = await fetch(
-        `${API_BASE}/search?q=${text}&user_id=${entry.user_id}`
-      );
+    const res = await fetch(`${API_BASE}/search?q=${text}&user_id=${entry.user_id}`);
     const data = await res.json();
 
     setResults(data.slice(0, 3));
@@ -426,35 +422,6 @@ export default function EditTime() {
           marginBottom: 10,
         }}
       />
-
-        <TouchableOpacity
-          onPress={() => {
-            const normalized = {
-              job_code: item.job_code ?? item.code ?? "",
-              job_name: item.job_name ?? item.name ?? "",
-              item_id: item.id ?? null,
-            };
-
-            setEntry((prev) => ({
-              ...(prev || {}),
-              ...normalized,
-            }));
-
-            setQuery(
-              `${normalized.job_name} (${normalized.job_code})`
-            );
-
-            setResults([]);
-          }}
-          style={{
-            backgroundColor: "#999",
-            padding: 8,
-            borderRadius: 6,
-            marginBottom: 10,
-          }}
-        >
-        </TouchableOpacity>
-      
       {Array.isArray(results) &&
         results.length > 0 &&
         results.map((item, index) => {
@@ -466,10 +433,9 @@ export default function EditTime() {
               onPress={() => {
                 setEntry({
                   ...(entry || {}),
-                  job_code: null,
-                  job_name: null,
-                  item_id: null,
-                })
+                  job_code: item.job_code || "",
+                  item_id: item.id ?? null,
+                });
 
                 setQuery(
                   `${item.job_name || "Unknown"} (${item.job_code || "No Code"})`,
