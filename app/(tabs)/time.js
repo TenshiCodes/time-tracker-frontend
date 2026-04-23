@@ -306,10 +306,10 @@ export default function Time() {
               onPress={() => {
                 setJob(item);
                 setActiveJob({
-                  code: data.job_code,
-                  name: data.job_name,
+                  code: item.job_code || item.code,
+                  name: item.job_name || item.name,
                 });
-                setQuery(`${item.name} (${item.code})`);
+                setQuery(`${item.name || item.job_name} (${item.code || item.job_code})`);
                 setResults([]);
               }}
               style={{
