@@ -181,7 +181,6 @@ export default function Users() {
     }
   };
   const [modalVisible, setModalVisible] = useState(false);
-  const [jobs, setJobs] = useState([]);
   const [assignedJobs, setAssignedJobs] = useState(new Set());
   const openJobModal = (user) => {
     setSelectedUser(user);
