@@ -69,7 +69,7 @@ export default function EditTime() {
     const res = await fetch(`${API_BASE}/time/entry/${id}`);
     const data = await res.json();
     console.log("entry data:", data);
-    
+
     setEntry(data);
     // 🔍 SEARCH JOBS
 
@@ -119,6 +119,8 @@ export default function EditTime() {
   const saveChanges = async () => {
     const updated = {
       ...entry,
+      job_code: entry.job_code || null,
+      item_id: entry.item_id || null,
       date,
       clock_in: formatForSQL(date, startTime),
       clock_out: formatForSQL(endDate || date, endTime),
