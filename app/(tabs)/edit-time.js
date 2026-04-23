@@ -45,9 +45,13 @@ export default function EditTime() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/search?q=${text}&user_id=${entry.user_id}`);
-    const data = await res.json();
+    if (!entry?.user_id) return; // ✅ ADD THIS
 
+    const res = await fetch(
+      `${API_BASE}/search?q=${text}&user_id=${entry.user_id}`
+    );
+
+    const data = await res.json();
     setResults(data.slice(0, 3));
   };
   const parseUTC = (str) => {
@@ -62,9 +66,10 @@ export default function EditTime() {
   };
 
   const loadEntry = async () => {
-    const res = await fetch(`${API_BASE}/time/${id}`);
+    const res = await fetch(`${API_BASE}/time/entry/${id}`);
     const data = await res.json();
-
+    console.log("entry data:", data);
+    
     setEntry(data);
     // 🔍 SEARCH JOBS
 
