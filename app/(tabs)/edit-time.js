@@ -150,7 +150,6 @@ export default function EditTime() {
       >
         Edit Time Entry
       </Text>
-
       {/* 📅 START DATE */}
       {Platform.OS !== "web" ? (
         <>
@@ -175,13 +174,16 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowDate(false);
                 if (selected && startDateObj) {
+                  // 🔥 MERGE date into existing Date
                   const updated = new Date(startDateObj);
                   updated.setFullYear(selected.getFullYear());
                   updated.setMonth(selected.getMonth());
                   updated.setDate(selected.getDate());
 
                   setStartDateObj(updated);
-                  setDate(updated.toLocaleDateString("en-CA"));
+
+                  const d = updated.toLocaleDateString("en-CA");
+                  setDate(d);
                 }
               }}
             />
@@ -193,9 +195,11 @@ export default function EditTime() {
           value={date}
           onChangeText={(text) => {
             setDate(text);
+
             if (!startDateObj || !text.includes("-")) return;
 
             const [y, m, d] = text.split("-");
+
             const updated = new Date(startDateObj);
             updated.setFullYear(Number(y));
             updated.setMonth(Number(m) - 1);
@@ -212,7 +216,6 @@ export default function EditTime() {
           }}
         />
       )}
-
       {/* ⏱ START TIME */}
       {Platform.OS !== "web" ? (
         <>
@@ -237,6 +240,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowStart(false);
                 if (selected && startDateObj) {
+                  // 🔥 MERGE time into existing date
                   const updated = new Date(startDateObj);
                   updated.setHours(selected.getHours());
                   updated.setMinutes(selected.getMinutes());
@@ -245,6 +249,7 @@ export default function EditTime() {
 
                   const h = updated.getHours().toString().padStart(2, "0");
                   const m = updated.getMinutes().toString().padStart(2, "0");
+
                   setStartTime(`${h}:${m}`);
                 }
               }}
@@ -257,9 +262,11 @@ export default function EditTime() {
           value={startTime}
           onChangeText={(text) => {
             setStartTime(text);
+
             if (!text.includes(":") || !startDateObj) return;
 
             const [h, m] = text.split(":");
+
             const updated = new Date(startDateObj);
             updated.setHours(Number(h));
             updated.setMinutes(Number(m));
@@ -275,7 +282,6 @@ export default function EditTime() {
           }}
         />
       )}
-
       {/* 📅 END DATE */}
       {Platform.OS !== "web" ? (
         <>
@@ -306,7 +312,9 @@ export default function EditTime() {
                   updated.setDate(selected.getDate());
 
                   setEndDateObj(updated);
-                  setEndDate(updated.toLocaleDateString("en-CA"));
+
+                  const d = updated.toLocaleDateString("en-CA");
+                  setEndDate(d);
                 }
               }}
             />
@@ -318,9 +326,11 @@ export default function EditTime() {
           value={endDate}
           onChangeText={(text) => {
             setEndDate(text);
+
             if (!endDateObj || !text.includes("-")) return;
 
             const [y, m, d] = text.split("-");
+
             const updated = new Date(endDateObj);
             updated.setFullYear(Number(y));
             updated.setMonth(Number(m) - 1);
@@ -337,7 +347,6 @@ export default function EditTime() {
           }}
         />
       )}
-
       {/* ⏱ END TIME */}
       {Platform.OS !== "web" ? (
         <>
@@ -362,6 +371,7 @@ export default function EditTime() {
               onChange={(e, selected) => {
                 setShowEnd(false);
                 if (selected && endDateObj) {
+                  // 🔥 MERGE time into existing date
                   const updated = new Date(endDateObj);
                   updated.setHours(selected.getHours());
                   updated.setMinutes(selected.getMinutes());
@@ -370,6 +380,7 @@ export default function EditTime() {
 
                   const h = updated.getHours().toString().padStart(2, "0");
                   const m = updated.getMinutes().toString().padStart(2, "0");
+
                   setEndTime(`${h}:${m}`);
                 }
               }}
@@ -382,9 +393,11 @@ export default function EditTime() {
           value={endTime}
           onChangeText={(text) => {
             setEndTime(text);
+
             if (!text.includes(":") || !endDateObj) return;
 
             const [h, m] = text.split(":");
+
             const updated = new Date(endDateObj);
             updated.setHours(Number(h));
             updated.setMinutes(Number(m));
@@ -400,7 +413,6 @@ export default function EditTime() {
           }}
         />
       )}
-
       {/* 🔍 JOB SEARCH */}
       <TextInput
         placeholder="Search Job..."
@@ -415,7 +427,34 @@ export default function EditTime() {
         }}
       />
 
-      {/* RESULTS */}
+        <TouchableOpacity
+          onPress={() => {
+            const normalized = {
+              job_code: item.job_code ?? item.code ?? "",
+              job_name: item.job_name ?? item.name ?? "",
+              item_id: item.id ?? null,
+            };
+
+            setEntry((prev) => ({
+              ...(prev || {}),
+              ...normalized,
+            }));
+
+            setQuery(
+              `${normalized.job_name} (${normalized.job_code})`
+            );
+
+            setResults([]);
+          }}
+          style={{
+            backgroundColor: "#999",
+            padding: 8,
+            borderRadius: 6,
+            marginBottom: 10,
+          }}
+        >
+        </TouchableOpacity>
+      
       {Array.isArray(results) &&
         results.length > 0 &&
         results.map((item, index) => {
@@ -425,19 +464,15 @@ export default function EditTime() {
             <TouchableOpacity
               key={item.id ?? index}
               onPress={() => {
-                const normalized = {
-                  job_code: item.job_code ?? item.code ?? "",
-                  job_name: item.job_name ?? item.name ?? "",
-                  item_id: item.id ?? null,
-                };
-
-                setEntry((prev) => ({
-                  ...(prev || {}),
-                  ...normalized,
-                }));
+                setEntry({
+                  ...(entry || {}),
+                  job_code: null,
+                  job_name: null,
+                  item_id: null,
+                })
 
                 setQuery(
-                  `${normalized.job_name} (${normalized.job_code})`
+                  `${item.job_name || "Unknown"} (${item.job_code || "No Code"})`,
                 );
 
                 setResults([]);
@@ -452,13 +487,10 @@ export default function EditTime() {
               <Text style={{ color: isDark ? "#fff" : "#000" }}>
                 {item.job_name || "No Name"}
               </Text>
-              <Text style={{ color: "#888" }}>
-                {item.job_code || "No Code"}
-              </Text>
+              <Text style={{ color: "#888" }}>{item.job_code || "No Code"}</Text>
             </TouchableOpacity>
           );
         })}
-
       {/* SAVE */}
       <TouchableOpacity
         onPress={saveChanges}
@@ -468,9 +500,7 @@ export default function EditTime() {
           borderRadius: 10,
         }}
       >
-        <Text style={{ color: "#fff", textAlign: "center" }}>
-          Save Changes
-        </Text>
+        <Text style={{ color: "#fff", textAlign: "center" }}>Save Changes</Text>
       </TouchableOpacity>
     </View>
   );
