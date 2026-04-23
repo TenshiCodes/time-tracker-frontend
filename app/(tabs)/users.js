@@ -304,8 +304,8 @@ export default function Users() {
                 jobs.map((job) => {
                   const isSelected = assignedJobs.has(job.id);
 
-                  const code = job.job_code || job.job_code || "";
-                  const name = job.job_name || job.job_name || "Unnamed Job";
+                  const code = job.code || job.job_code || "";
+                  const name = job.name || job.job_name || "Unnamed Job";
 
                   return (
                     <TouchableOpacity
@@ -332,7 +332,7 @@ export default function Users() {
                         }}
                       >
                         {isSelected ? "✓ " : ""}
-                        {job_code ? `${job_code} - ${job_name}` : job_name}
+                        {code ? `${code} - ${name}` : name}
                       </Text>
                     </TouchableOpacity>
                   );
