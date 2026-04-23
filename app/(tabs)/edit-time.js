@@ -62,7 +62,7 @@ export default function EditTime() {
   };
 
   const loadEntry = async () => {
-    const res = await fetch(`${API_BASE}/time/entry/${id}`);
+    const res = await fetch(`${API_BASE}/time/${id}`);
     const data = await res.json();
 
     setEntry(data);
