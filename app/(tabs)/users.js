@@ -300,39 +300,43 @@ export default function Users() {
             </Text>
 
             <ScrollView>
-              {jobs.map((job) => {
-                const isSelected = assignedJobs.has(job.id);
+              {Array.isArray(jobs) &&
+                jobs.map((job) => {
+                  const isSelected = assignedJobs.has(job.id);
 
-                return (
-                  <TouchableOpacity
-                    key={job.id}
-                    onPress={() => toggleJob(job.id)}
-                    style={{
-                      padding: 12,
-                      marginBottom: 8,
-                      borderRadius: 8,
-                      backgroundColor: isSelected
-                        ? "#4CAF50"
-                        : isDark
-                        ? "#333"
-                        : "#ddd",
-                    }}
-                  >
-                    <Text
+                  const code = job.code || job.job_code || "";
+                  const name = job.name || job.job_name || "Unnamed Job";
+
+                  return (
+                    <TouchableOpacity
+                      key={job.id}
+                      onPress={() => toggleJob(job.id)}
                       style={{
-                        color: isSelected
-                          ? "#fff"
+                        padding: 12,
+                        marginBottom: 8,
+                        borderRadius: 8,
+                        backgroundColor: isSelected
+                          ? "#4CAF50"
                           : isDark
-                          ? "#fff"
-                          : "#000",
+                          ? "#333"
+                          : "#ddd",
                       }}
                     >
-                      {isSelected ? "✓ " : ""}
-                      {job.code} - {job.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+                      <Text
+                        style={{
+                          color: isSelected
+                            ? "#fff"
+                            : isDark
+                            ? "#fff"
+                            : "#000",
+                        }}
+                      >
+                        {isSelected ? "✓ " : ""}
+                        {code ? `${code} - ${name}` : name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
             </ScrollView>
 
             <TouchableOpacity
