@@ -284,8 +284,8 @@ export default function AdminDashboard() {
             >
               <option value="">All Jobs</option>
               {jobs.map((j) => (
-                <option key={j.id} value={j.code}>
-                  {j.code} - {j.name}
+                <option key={j.id} value={j.job_code}>
+                  {j.job_code} - {j.job_name}
                 </option>
               ))}
             </select>
@@ -302,8 +302,8 @@ export default function AdminDashboard() {
               {jobs.map((j) => (
                 <Picker.Item
                   key={j.id}
-                  label={`${j.code} - ${j.name}`}
-                  value={j.code}
+                  label={`${j.job_code} - ${j.job_name}`}
+                  value={j.job_code}
                 />
               ))}
             </Picker>
