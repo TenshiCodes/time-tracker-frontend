@@ -37,6 +37,7 @@ export default function EditTime() {
   useEffect(() => {
     if (id) loadEntry();
   }, [id]);
+
   const searchJobs = async (text) => {
     setQuery(text);
 
@@ -114,6 +115,13 @@ export default function EditTime() {
     const local = new Date(y, mo - 1, d, h, m);
 
     return local.toISOString();
+  };
+
+  const deleteEntry = async () => {
+    await fetch(`${API_BASE}/time/${id}`, {
+      method: "DELETE",
+    });
+    router.replace("/time");
   };
 
   const saveChanges = async () => {
@@ -474,6 +482,17 @@ export default function EditTime() {
         }}
       >
         <Text style={{ color: "#fff", textAlign: "center" }}>Save Changes</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={deleteEntry}
+        style={{
+          backgroundColor: "#e53935",
+          padding: 15,
+          borderRadius: 10,
+          marginTop: 10,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Delete Entry</Text>
       </TouchableOpacity>
     </View>
   );
