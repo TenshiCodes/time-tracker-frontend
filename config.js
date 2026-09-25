@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
   // 🌐 Production (web + mobile)
   if (typeof window !== "undefined") {
-    return "https://causing-concrete-mass-variations.trycloudflare.com";
+    return "https://offerings-buses-mill-experienced.trycloudflare.com";
   }
 
   // 📱 Expo dev (local testing)
